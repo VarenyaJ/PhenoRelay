@@ -5,8 +5,11 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
+import yaml
 
 from phenorelay import __version__
+from phenorelay.evidence import check_evidence_snippets
+from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
 
 app = typer.Typer(
     name="phenorelay",
@@ -63,3 +66,41 @@ def inspect(
             sort_keys=True,
         )
     )
+
+
+@app.command("validate-evidence")
+def validate_evidence(
+    outcome: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Query outcome YAML file containing evidence snippets.",
+        ),
+    ],
+    cache_dir: Annotated[
+        Path,
+        typer.Option(
+            "--cache-dir",
+            exists=True,
+            file_okay=False,
+            readable=True,
+            help="Directory of reviewed Markdown reference-cache files.",
+        ),
+    ],
+) -> None:
+    """Check that outcome evidence snippets appear in reviewed cache files."""
+    data = yaml.safe_load(outcome.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise typer.BadParameter("outcome must contain a YAML mapping")
+
+    try:
+        cache = load_reference_cache(cache_dir)
+    except ReferenceCacheError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    checks = check_evidence_snippets(data, cache)
+    typer.echo(json.dumps([check.to_dict() for check in checks], indent=2, sort_keys=True))
+    if any(not check.ok for check in checks):
+        raise typer.Exit(1)

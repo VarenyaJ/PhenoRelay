@@ -13,3 +13,18 @@ Initial rules:
 - network-backed fetches should run in CI or explicit local commands, never on
   package import.
 
+The first cache format is reviewed Markdown with YAML frontmatter:
+
+```markdown
+---
+reference: PMID:00000000
+title: Synthetic reference for evidence validation
+source_url: https://pubmed.ncbi.nlm.nih.gov/00000000/
+---
+
+Synthetic placeholder text for schema validation.
+```
+
+The initial validator is intentionally offline. It loads reviewed cache files,
+matches each `reference`, and checks whether normalized snippet text appears in
+the cached body.

@@ -9,7 +9,7 @@ Remote checks should include:
 - Python lint and tests;
 - MkDocs strict build;
 - LinkML schema lint and example validation;
-- reference-cache and evidence-snippet checks once evidence examples are tracked.
+- reference-cache and evidence-snippet checks.
 
 Security review should happen whenever dependencies, imports, workflows, agent
 hooks, generated files, caches, or imported external material change.

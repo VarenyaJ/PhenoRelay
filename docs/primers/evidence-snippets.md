@@ -14,3 +14,11 @@ The intended contract:
 Evidence support is optional for core discovery, but useful for examples, query
 interpretation notes, and agent-assisted review.
 
+The first command is:
+
+```bash
+uv run phenorelay validate-evidence examples/query-outcome.yaml --cache-dir examples/reference-cache
+```
+
+It reports one JSON object per snippet and exits non-zero when a reference is
+missing from the reviewed cache or the quoted text is not found.
