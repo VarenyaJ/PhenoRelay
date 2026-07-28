@@ -12,6 +12,20 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  python:
+    name: Python
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --extra dev --extra schema --extra docs
+      - run: uv run ruff check src tests
+      - run: uv run pytest
+
   check:
     name: Check (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

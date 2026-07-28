@@ -7,9 +7,9 @@ It is not a strict Beacon implementation. Sites retain their source GA4GH
 Phenopacket v2 JSON and expose only the query capabilities and response detail
 they choose.
 
-The authoritative implementation is Rust. An official Python package will expose
-coarse local operations through PyO3/maturin and provide a client for the
-versioned HTTP service.
+PhenoRelay exposes both Rust and Python surfaces. Rust is the lightweight engine
+path for deployable discovery. Python is the schema, evidence, documentation, and
+agent-tooling path, and can also run local discovery utilities.
 
 Initial discovery scope:
 
@@ -29,8 +29,8 @@ cd PhenoRelay
 cargo test --workspace --locked
 ```
 
-GitHub Actions runs the Rust checks on pull requests and pushes. Run the same
-checks directly when needed:
+GitHub Actions runs checks on pull requests and pushes. Run the Rust checks
+directly when needed:
 
 ```bash
 cargo test --workspace --all-features --all-targets --locked
@@ -40,8 +40,13 @@ RUSTDOCFLAGS="-D warnings -D rustdoc::broken_intra_doc_links" \
   cargo doc --workspace --all-features --no-deps --locked
 ```
 
-Python and release commands will be added with the binding slice. Do not install
-an unmanaged Python environment.
+Use `uv` for the Python surface. Do not install an unmanaged Python environment.
+
+```bash
+uv sync --extra dev --extra schema --extra docs
+uv run phenorelay --help
+uv run pytest
+```
 
 Keep each commit limited to one reviewable concern. Before committing, inspect the
 staged patch:

@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[project]
+name = "phenorelay"
+description = "Phenopacket-native federated discovery with optional evidence and agent tooling."
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+license = "AGPL-3.0-only"
+authors = [
+  { name = "VarenyaJ", email = "varenyajj@gmail.com" },
+]
+dynamic = ["version"]
+dependencies = [
+  "linkml-runtime>=1.9.4",
+  "pydantic>=2.0",
+  "pyyaml>=6.0",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.8",
+]
+docs = [
+  "mkdocs-material>=9.5",
+  "mkdocs>=1.6",
+  "pymdown-extensions>=10.0",
+]
+schema = [
+  "linkml>=1.9",
+  "linkml-reference-validator>=0.2.1rc2",
+  "linkml-term-validator>=0.4.4",
+]
+
+[project.scripts]
+phenorelay = "phenorelay.cli:app"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/phenorelay"]
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "pep440"
+fallback-version = "0.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

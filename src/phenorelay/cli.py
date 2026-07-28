@@ -1,0 +1,65 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Annotated
+
+import typer
+
+from phenorelay import __version__
+
+app = typer.Typer(
+    name="phenorelay",
+    help="Phenopacket-native discovery, evidence, and federation tooling.",
+    no_args_is_help=True,
+)
+
+
+@app.callback()
+def main(
+    version: Annotated[
+        bool,
+        typer.Option("--version", help="Show the PhenoRelay version and exit."),
+    ] = False,
+) -> None:
+    if version:
+        typer.echo(__version__)
+        raise typer.Exit
+
+
+@app.command()
+def inspect(
+    phenopacket: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Phenopacket JSON file to inspect.",
+        ),
+    ],
+    show_subject_id: Annotated[
+        bool,
+        typer.Option(
+            "--show-subject-id",
+            help="Include the subject identifier in output. Use only with non-sensitive data.",
+        ),
+    ] = False,
+) -> None:
+    """Print minimal identity fields from a Phenopacket JSON file."""
+    data = json.loads(phenopacket.read_text(encoding="utf-8"))
+    subject_id = (data.get("subject") or {}).get("id") if show_subject_id else None
+    typer.echo(
+        json.dumps(
+            {
+                "phenopacket_id": data.get("id"),
+                "subject_id": subject_id,
+                "subject_id_redacted": not show_subject_id,
+                "phenotype_count": len(data.get("phenotypicFeatures") or []),
+                "disease_count": len(data.get("diseases") or []),
+                "medical_action_count": len(data.get("medicalActions") or []),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
