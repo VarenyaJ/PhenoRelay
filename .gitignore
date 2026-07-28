@@ -1,6 +1,8 @@
 /target/
 /docs/_build/
 /docs/.venv/
+/docs/inspirations/
+/docs/uv.lock
 .venv/
 __pycache__/
 *.py[cod]

@@ -15,3 +15,7 @@ Initial model areas:
 
 Rust and Python should both read and write examples for these contracts.
 
+The first schema lives at `src/phenorelay/schema/phenorelay.yaml`. The first
+examples live under `examples/` and cover a site manifest, a query request, and a
+query outcome with optional evidence.
+

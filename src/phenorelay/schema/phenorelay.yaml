@@ -1,0 +1,222 @@
+id: https://w3id.org/phenorelay/schema
+name: phenorelay
+title: PhenoRelay Exchange Schema
+description: Shared contracts for Phenopacket-native discovery, evidence, and federation.
+license: AGPL-3.0-only
+
+imports:
+  - linkml:types
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  xsd: http://www.w3.org/2001/XMLSchema#
+  phenorelay: https://w3id.org/phenorelay/
+  HP: http://purl.obolibrary.org/obo/HP_
+  MONDO: http://purl.obolibrary.org/obo/MONDO_
+  MAXO: http://purl.obolibrary.org/obo/MAXO_
+  HGNC: https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/
+  PMID: https://pubmed.ncbi.nlm.nih.gov/
+  DOI: https://doi.org/
+
+default_prefix: phenorelay
+default_range: string
+
+enums:
+  QueryFeatureEnum:
+    permissible_values:
+      phenotype:
+      disease:
+      medical_action:
+      gene:
+      cohort_statistics:
+  MatchModeEnum:
+    permissible_values:
+      exact:
+      descendants:
+  TermPresenceEnum:
+    permissible_values:
+      present:
+      excluded:
+      any:
+  ResponseGranularityEnum:
+    permissible_values:
+      existence:
+      count:
+      record:
+  QueryStatusEnum:
+    permissible_values:
+      match:
+      unsupported:
+      forbidden:
+      unavailable:
+  EvidenceSupportEnum:
+    permissible_values:
+      support:
+      refute:
+      partial:
+      no_evidence:
+      wrong_statement:
+
+types:
+  Curie:
+    base: str
+    uri: xsd:string
+  ReferenceCurie:
+    base: str
+    uri: xsd:string
+
+slots:
+  site_id:
+    range: string
+    required: true
+  site_name:
+    range: string
+  release_id:
+    range: string
+    required: true
+  generated_at:
+    range: datetime
+  phenopacket_schema_version:
+    range: string
+  ontology_releases:
+    multivalued: true
+    inlined_as_list: true
+    range: OntologyRelease
+  supported_features:
+    multivalued: true
+    range: QueryFeatureEnum
+  supported_granularities:
+    multivalued: true
+    range: ResponseGranularityEnum
+  ontology_prefix:
+    range: string
+    required: true
+  ontology_version:
+    range: string
+    required: true
+  term:
+    range: Curie
+  match_mode:
+    range: MatchModeEnum
+  presence:
+    range: TermPresenceEnum
+  feature:
+    range: QueryFeatureEnum
+  requested_granularity:
+    range: ResponseGranularityEnum
+  query_id:
+    identifier: true
+    range: string
+    required: true
+  status:
+    range: QueryStatusEnum
+    required: true
+  exists:
+    range: boolean
+  count:
+    range: integer
+    minimum_value: 0
+  unavailable_reason:
+    range: string
+  records:
+    multivalued: true
+    inlined_as_list: true
+    range: ProjectedRecord
+  phenopacket_id:
+    range: string
+    required: true
+  subject_id:
+    range: string
+  subject_id_redacted:
+    range: boolean
+    required: true
+  phenotypes:
+    multivalued: true
+    inlined_as_list: true
+    range: ProjectedTerm
+  diseases:
+    multivalued: true
+    inlined_as_list: true
+    range: ProjectedTerm
+  medical_actions:
+    multivalued: true
+    range: Curie
+  has_genomic_interpretations:
+    range: boolean
+  reference:
+    range: ReferenceCurie
+    required: true
+  snippet:
+    range: string
+    required: true
+  support:
+    range: EvidenceSupportEnum
+    required: true
+  explanation:
+    range: string
+  evidence:
+    multivalued: true
+    inlined_as_list: true
+    range: EvidenceSnippet
+
+classes:
+  SiteManifest:
+    tree_root: true
+    slots:
+      - site_id
+      - site_name
+      - release_id
+      - generated_at
+      - phenopacket_schema_version
+      - ontology_releases
+      - supported_features
+      - supported_granularities
+
+  OntologyRelease:
+    slots:
+      - ontology_prefix
+      - ontology_version
+
+  QueryRequest:
+    tree_root: true
+    slots:
+      - query_id
+      - feature
+      - term
+      - match_mode
+      - presence
+      - requested_granularity
+
+  QueryOutcome:
+    tree_root: true
+    slots:
+      - query_id
+      - status
+      - feature
+      - exists
+      - count
+      - unavailable_reason
+      - records
+      - evidence
+
+  ProjectedRecord:
+    slots:
+      - phenopacket_id
+      - subject_id
+      - subject_id_redacted
+      - phenotypes
+      - diseases
+      - medical_actions
+      - has_genomic_interpretations
+
+  ProjectedTerm:
+    slots:
+      - term
+      - presence
+
+  EvidenceSnippet:
+    slots:
+      - reference
+      - snippet
+      - support
+      - explanation

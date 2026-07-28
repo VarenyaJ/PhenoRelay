@@ -26,6 +26,10 @@ jobs:
       - run: uv run ruff check src tests
       - run: uv run pytest
       - run: uv run mkdocs build --strict
+      - run: uv run linkml-lint src/phenorelay/schema
+      - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class SiteManifest examples/site-manifest.yaml
+      - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class QueryRequest examples/query-request.yaml
+      - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class QueryOutcome examples/query-outcome.yaml
 
   check:
     name: Check (${{ matrix.os }})

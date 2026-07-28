@@ -1,0 +1,16 @@
+site_id: synthetic-site
+site_name: Synthetic PhenoRelay Site
+release_id: synthetic-release-1
+phenopacket_schema_version: "2.0"
+ontology_releases:
+  - ontology_prefix: HP
+    ontology_version: synthetic
+  - ontology_prefix: MONDO
+    ontology_version: synthetic
+supported_features:
+  - phenotype
+  - disease
+  - medical_action
+supported_granularities:
+  - existence
+  - count
