@@ -1,0 +1,54 @@
+site_name: PhenoRelay
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+  features:
+    - content.tabs.link
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+  font: false
+
+extra_css:
+  - stylesheets/phenorelay.css
+
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-]+'
+
+markdown_extensions:
+  - pymdownx.superfences
+
+validation:
+  nav:
+    omitted_files: ignore
+
+nav:
+  - Home: index.md
+  - About:
+      - Project Shape: about.md
+      - Use Cases: use-cases.md
+  - Primers:
+      - Phenopacket-Native Discovery: primers/phenopacket-native-discovery.md
+      - Capability-Aware Federation: primers/capability-aware-federation.md
+      - Evidence Snippets: primers/evidence-snippets.md
+  - How-to Guides:
+      - Quality Control: quality-control.md
+      - Agent Workflows: agent-workflows.md
+      - Reference Caches: reference-caches.md
+  - Explanation:
+      - Design Decisions: design/decisions.md
+      - Bycon and Beacon: design/bycon-and-beacon.md
+      - Privacy Defaults: design/privacy-defaults.md
+  - Data Model: data-model.md
+  - Tools & Scripts: tools-and-scripts.md
+  - Migration:
+      - Rust and Python Tradeoffs: migration/rust-python-tradeoffs.md
+  - Working Notes:
+      - Notes: notes.md

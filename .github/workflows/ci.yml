@@ -25,6 +25,7 @@ jobs:
       - run: uv sync --extra dev --extra schema --extra docs
       - run: uv run ruff check src tests
       - run: uv run pytest
+      - run: uv run mkdocs build --strict
 
   check:
     name: Check (${{ matrix.os }})
