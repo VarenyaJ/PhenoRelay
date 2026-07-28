@@ -3,6 +3,7 @@
 /docs/.venv/
 /docs/inspirations/
 /docs/uv.lock
+/.claude/
 .venv/
 __pycache__/
 *.py[cod]

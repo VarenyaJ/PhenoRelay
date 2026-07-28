@@ -15,3 +15,6 @@ Rules for agent workflows:
 Claude-specific commands may live under `.claude/`, but public docs should explain
 the workflow in terms that other coding agents can follow.
 
+For now, repository-specific agent command files should stay untracked unless
+they are reviewed as part of a dedicated tooling change. Public docs should
+describe the workflow contract rather than depend on one agent runtime.
