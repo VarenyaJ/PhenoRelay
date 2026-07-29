@@ -1,6 +1,7 @@
 mod identifier;
 mod projection;
 mod query;
+pub mod storage;
 
 pub use identifier::{IdentifierError, OntologyTermId};
 pub use projection::{
@@ -10,4 +11,7 @@ pub use projection::{
 pub use query::{
     MatchMode, Query, QueryFeature, QueryOutcome, ResponseGranularity, TermPresence,
     UnavailableReason,
+};
+pub use storage::{
+    BackendCapabilities, BackendKind, BackendRole, BackendStatus, MemoryBackend, StorageBackend,
 };

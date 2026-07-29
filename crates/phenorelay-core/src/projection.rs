@@ -17,6 +17,24 @@ pub struct RecordProjection {
 }
 
 impl RecordProjection {
+    pub fn new(
+        phenopacket_id: String,
+        subject_id: String,
+        phenotypes: Vec<ProjectedPhenotype>,
+        diseases: Vec<ProjectedDisease>,
+        recorded_medical_actions: Vec<OntologyTermId>,
+        has_genomic_interpretations: bool,
+    ) -> Self {
+        Self {
+            phenopacket_id,
+            subject_id,
+            phenotypes,
+            diseases,
+            recorded_medical_actions,
+            has_genomic_interpretations,
+        }
+    }
+
     pub fn phenopacket_id(&self) -> &str {
         &self.phenopacket_id
     }
@@ -208,14 +226,14 @@ fn project_phenopacket_inner(
     });
     recorded_medical_actions.sort();
 
-    Ok(RecordProjection {
-        phenopacket_id: phenopacket_id.to_owned(),
-        subject_id: subject_id.to_owned(),
+    Ok(RecordProjection::new(
+        phenopacket_id.to_owned(),
+        subject_id.to_owned(),
         phenotypes,
         diseases,
         recorded_medical_actions,
         has_genomic_interpretations,
-    })
+    ))
 }
 
 fn project_recorded_medical_action(

@@ -46,6 +46,7 @@ nav:
       - Design Decisions: design/decisions.md
       - Bycon and Beacon: design/bycon-and-beacon.md
       - Privacy Defaults: design/privacy-defaults.md
+      - Storage Backends: design/storage-backends.md
   - Data Model: data-model.md
   - Tools & Scripts: tools-and-scripts.md
   - Migration:
