@@ -8,8 +8,9 @@ import typer
 import yaml
 
 from phenorelay import __version__
-from phenorelay.backends import backend_capabilities
+from phenorelay.backends import BACKEND_CAPABILITIES, filter_backend_capabilities
 from phenorelay.evidence import check_evidence_snippets
+from phenorelay.manifest import ManifestError, load_site_manifest
 from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
 
 app = typer.Typer(
@@ -70,9 +71,56 @@ def inspect(
 
 
 @app.command()
-def backends() -> None:
+def backends(
+    manifest: Annotated[
+        Path | None,
+        typer.Option(
+            "--manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Site manifest YAML file to inspect instead of the built-in catalog.",
+        ),
+    ] = None,
+    role: Annotated[
+        str | None,
+        typer.Option("--role", help="Only include backends with this role."),
+    ] = None,
+    status: Annotated[
+        str | None,
+        typer.Option("--status", help="Only include backends with this status."),
+    ] = None,
+    supports: Annotated[
+        str | None,
+        typer.Option(
+            "--supports",
+            help="Only include backends where the named supports_* capability is true.",
+        ),
+    ] = None,
+) -> None:
     """Print scaffolded storage backend capability metadata."""
-    typer.echo(json.dumps(backend_capabilities(), indent=2, sort_keys=True))
+    try:
+        capabilities = (
+            load_site_manifest(manifest).storage_backends
+            if manifest is not None
+            else BACKEND_CAPABILITIES
+        )
+        filtered = filter_backend_capabilities(
+            capabilities,
+            role=role,
+            status=status,
+            supports=supports,
+        )
+    except (ManifestError, ValueError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    typer.echo(
+        json.dumps(
+            [capability.to_dict() for capability in filtered],
+            indent=2,
+            sort_keys=True,
+        )
+    )
 
 
 @app.command("validate-evidence")
