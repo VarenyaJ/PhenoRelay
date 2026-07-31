@@ -8,6 +8,7 @@ import typer
 import yaml
 
 from phenorelay import __version__
+from phenorelay.backends import backend_capabilities
 from phenorelay.evidence import check_evidence_snippets
 from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
 
@@ -66,6 +67,12 @@ def inspect(
             sort_keys=True,
         )
     )
+
+
+@app.command()
+def backends() -> None:
+    """Print scaffolded storage backend capability metadata."""
+    typer.echo(json.dumps(backend_capabilities(), indent=2, sort_keys=True))
 
 
 @app.command("validate-evidence")

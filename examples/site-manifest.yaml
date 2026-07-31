@@ -14,3 +14,64 @@ supported_features:
 supported_granularities:
   - existence
   - count
+storage_backends:
+  - backend_kind: memory
+    backend_role: serving_index
+    backend_status: implemented
+    supports_release_activation: true
+    supports_existence: true
+    supports_counts: true
+    supports_records: false
+    supports_phenotype_filters: true
+    supports_disease_filters: true
+    supports_medical_action_filters: true
+    supports_gene_filters: false
+    supports_variant_filters: false
+    supports_descendant_expansion: false
+    supports_full_text: false
+    beacon_compatible_adapter_target: true
+  - backend_kind: postgres
+    backend_role: serving_index
+    backend_status: scaffolded
+    supports_release_activation: true
+    supports_existence: true
+    supports_counts: true
+    supports_records: true
+    supports_phenotype_filters: true
+    supports_disease_filters: true
+    supports_medical_action_filters: true
+    supports_gene_filters: true
+    supports_variant_filters: true
+    supports_descendant_expansion: false
+    supports_full_text: false
+    beacon_compatible_adapter_target: true
+  - backend_kind: trino
+    backend_role: analytics
+    backend_status: scaffolded
+    supports_release_activation: false
+    supports_existence: false
+    supports_counts: true
+    supports_records: false
+    supports_phenotype_filters: true
+    supports_disease_filters: true
+    supports_medical_action_filters: false
+    supports_gene_filters: true
+    supports_variant_filters: true
+    supports_descendant_expansion: false
+    supports_full_text: false
+    beacon_compatible_adapter_target: true
+  - backend_kind: redis_valkey
+    backend_role: cache
+    backend_status: scaffolded
+    supports_release_activation: false
+    supports_existence: false
+    supports_counts: false
+    supports_records: false
+    supports_phenotype_filters: false
+    supports_disease_filters: false
+    supports_medical_action_filters: false
+    supports_gene_filters: false
+    supports_variant_filters: false
+    supports_descendant_expansion: false
+    supports_full_text: false
+    beacon_compatible_adapter_target: false

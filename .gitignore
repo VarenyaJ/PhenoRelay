@@ -1,4 +1,5 @@
 /target/
+/site/
 /docs/_build/
 /docs/.venv/
 /docs/inspirations/

@@ -56,6 +56,61 @@ enums:
       partial:
       no_evidence:
       wrong_statement:
+  BackendKindEnum:
+    permissible_values:
+      memory:
+      sqlite:
+      postgres:
+      mongodb:
+      clickhouse:
+      duckdb:
+      snowflake:
+      redshift:
+      databricks_sql:
+      bigquery:
+      trino:
+      iceberg:
+      parquet:
+      arrow:
+      avro:
+      delta_lake:
+      hudi:
+      polaris:
+      apache_doris:
+      opensearch:
+      elasticsearch:
+      hail:
+      spark:
+      sail:
+      velox:
+      lakehouse:
+      terra:
+      anvil:
+      gnomad:
+      hdf5:
+      genomicsdb:
+      tiledb:
+      tiledb_vcf:
+      fhir:
+      omop:
+      redis_valkey:
+  BackendRoleEnum:
+    permissible_values:
+      serving_index:
+      analytics:
+      search:
+      warehouse:
+      table_format:
+      compute_engine:
+      deployment_platform:
+      reference_resource:
+      genomics_engine:
+      clinical_interoperability:
+      cache:
+  BackendStatusEnum:
+    permissible_values:
+      implemented:
+      scaffolded:
 
 types:
   Curie:
@@ -88,6 +143,10 @@ slots:
   supported_granularities:
     multivalued: true
     range: ResponseGranularityEnum
+  storage_backends:
+    multivalued: true
+    inlined_as_list: true
+    range: StorageBackendCapabilities
   ontology_prefix:
     range: string
     required: true
@@ -158,6 +217,39 @@ slots:
     multivalued: true
     inlined_as_list: true
     range: EvidenceSnippet
+  backend_kind:
+    range: BackendKindEnum
+    required: true
+  backend_role:
+    range: BackendRoleEnum
+    required: true
+  backend_status:
+    range: BackendStatusEnum
+    required: true
+  supports_release_activation:
+    range: boolean
+  supports_existence:
+    range: boolean
+  supports_counts:
+    range: boolean
+  supports_records:
+    range: boolean
+  supports_phenotype_filters:
+    range: boolean
+  supports_disease_filters:
+    range: boolean
+  supports_medical_action_filters:
+    range: boolean
+  supports_gene_filters:
+    range: boolean
+  supports_variant_filters:
+    range: boolean
+  supports_descendant_expansion:
+    range: boolean
+  supports_full_text:
+    range: boolean
+  beacon_compatible_adapter_target:
+    range: boolean
 
 classes:
   SiteManifest:
@@ -171,6 +263,7 @@ classes:
       - ontology_releases
       - supported_features
       - supported_granularities
+      - storage_backends
 
   OntologyRelease:
     slots:
@@ -220,3 +313,21 @@ classes:
       - snippet
       - support
       - explanation
+
+  StorageBackendCapabilities:
+    slots:
+      - backend_kind
+      - backend_role
+      - backend_status
+      - supports_release_activation
+      - supports_existence
+      - supports_counts
+      - supports_records
+      - supports_phenotype_filters
+      - supports_disease_filters
+      - supports_medical_action_filters
+      - supports_gene_filters
+      - supports_variant_filters
+      - supports_descendant_expansion
+      - supports_full_text
+      - beacon_compatible_adapter_target

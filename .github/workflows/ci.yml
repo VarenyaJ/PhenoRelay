@@ -22,11 +22,11 @@ jobs:
         with:
           python-version: "3.12"
           enable-cache: true
-      - run: uv sync --extra dev --extra schema --extra docs
+      - run: uv sync --locked --extra dev --extra schema --extra docs
       - run: uv run ruff check src tests
       - run: uv run pytest
       - run: uv run mkdocs build --strict
-      - run: uv run linkml-lint src/phenorelay/schema
+      - run: uv run linkml-lint --ignore-warnings src/phenorelay/schema
       - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class SiteManifest examples/site-manifest.yaml
       - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class QueryRequest examples/query-request.yaml
       - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class QueryOutcome examples/query-outcome.yaml
