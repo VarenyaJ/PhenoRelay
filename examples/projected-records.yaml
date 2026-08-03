@@ -1,0 +1,25 @@
+records:
+  - phenopacket_id: synthetic-packet-1
+    subject_id_redacted: true
+    phenotypes:
+      - term: HP:0001250
+        presence: present
+      - term: HP:0011344
+        presence: excluded
+    diseases:
+      - term: MONDO:0000001
+        presence: present
+    medical_actions:
+      - MAXO:0000072
+    has_genomic_interpretations: false
+  - phenopacket_id: synthetic-packet-2
+    subject_id_redacted: true
+    phenotypes:
+      - term: HP:0004322
+        presence: present
+    diseases:
+      - term: MONDO:0000002
+        presence: present
+    medical_actions:
+      - MAXO:0001175
+    has_genomic_interpretations: true

@@ -28,6 +28,7 @@ jobs:
       - run: uv run mkdocs build --strict
       - run: uv run linkml-lint --ignore-warnings src/phenorelay/schema
       - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class SiteManifest examples/site-manifest.yaml
+      - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class ProjectedRecordCollection examples/projected-records.yaml
       - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class QueryRequest examples/query-request.yaml
       - run: uv run linkml-validate --schema src/phenorelay/schema/phenorelay.yaml --target-class QueryOutcome examples/query-outcome.yaml
       - run: uv run phenorelay validate-evidence examples/query-outcome.yaml --cache-dir examples/reference-cache

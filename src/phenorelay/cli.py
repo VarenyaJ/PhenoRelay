@@ -10,6 +10,12 @@ import yaml
 from phenorelay import __version__
 from phenorelay.backends import BACKEND_CAPABILITIES, filter_backend_capabilities
 from phenorelay.evidence import check_evidence_snippets
+from phenorelay.index import (
+    IndexError,
+    LocalReleaseIndex,
+    load_projected_records,
+    load_query_request,
+)
 from phenorelay.manifest import ManifestError, load_site_manifest
 from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
 
@@ -123,6 +129,76 @@ def backends(
     )
 
 
+@app.command("index-summary")
+def index_summary(
+    manifest: Annotated[
+        Path,
+        typer.Option(
+            "--manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Site manifest YAML file for the local release.",
+        ),
+    ],
+    records: Annotated[
+        Path,
+        typer.Option(
+            "--records",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Projected record YAML file to index.",
+        ),
+    ],
+) -> None:
+    """Print a summary for a local projected-record release index."""
+    index = build_local_index(manifest, records)
+    typer.echo(json.dumps(index.summary(), indent=2, sort_keys=True))
+
+
+@app.command("query-local")
+def query_local(
+    manifest: Annotated[
+        Path,
+        typer.Option(
+            "--manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Site manifest YAML file for the local release.",
+        ),
+    ],
+    records: Annotated[
+        Path,
+        typer.Option(
+            "--records",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Projected record YAML file to query.",
+        ),
+    ],
+    request: Annotated[
+        Path,
+        typer.Option(
+            "--request",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Query request YAML file.",
+        ),
+    ],
+) -> None:
+    """Run one query request against a local projected-record release index."""
+    try:
+        index = build_local_index(manifest, records)
+        outcome = index.query(load_query_request(request))
+    except (ManifestError, IndexError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(json.dumps(outcome, indent=2, sort_keys=True))
+
+
 @app.command("validate-evidence")
 def validate_evidence(
     outcome: Annotated[
@@ -159,3 +235,13 @@ def validate_evidence(
     typer.echo(json.dumps([check.to_dict() for check in checks], indent=2, sort_keys=True))
     if any(not check.ok for check in checks):
         raise typer.Exit(1)
+
+
+def build_local_index(manifest: Path, records: Path) -> LocalReleaseIndex:
+    try:
+        return LocalReleaseIndex.build(
+            manifest=load_site_manifest(manifest),
+            records=load_projected_records(records),
+        )
+    except (ManifestError, IndexError) as exc:
+        raise typer.BadParameter(str(exc)) from exc

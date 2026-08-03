@@ -331,3 +331,8 @@ classes:
       - supports_descendant_expansion
       - supports_full_text
       - beacon_compatible_adapter_target
+
+  ProjectedRecordCollection:
+    tree_root: true
+    slots:
+      - records
