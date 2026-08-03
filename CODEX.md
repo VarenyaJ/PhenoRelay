@@ -160,7 +160,7 @@ Before adding a dependency:
 - Do not use `--no-verify`.
 - If a hook fails, fix the issue and create a new commit. Do not amend to bypass it.
 - Do not add `Co-Authored-By` lines.
-- Never stage secrets, PHI, real patient data, or local-only notes.
+- Never stage secrets, PHI, real patient data, or private/internal-only notes.
 
 ---
 
