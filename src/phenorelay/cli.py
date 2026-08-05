@@ -23,6 +23,7 @@ from phenorelay.index import (
 )
 from phenorelay.manifest import ManifestError, load_site_manifest
 from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
+from phenorelay.sqlite_index import SQLiteIndexError, SQLiteReleaseIndex
 
 app = typer.Typer(
     name="phenorelay",
@@ -200,6 +201,102 @@ def query_local(
         index = build_local_index(manifest, records)
         outcome = index.query(load_query_request(request))
     except (ManifestError, IndexError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(json.dumps(outcome, indent=2, sort_keys=True))
+
+
+@app.command("sqlite-build")
+def sqlite_build(
+    manifest: Annotated[
+        Path,
+        typer.Option(
+            "--manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Site manifest YAML file for the local release.",
+        ),
+    ],
+    records: Annotated[
+        Path,
+        typer.Option(
+            "--records",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Projected record YAML file to index.",
+        ),
+    ],
+    db: Annotated[
+        Path,
+        typer.Option(
+            "--db",
+            dir_okay=False,
+            writable=True,
+            help="SQLite database file to create or replace.",
+        ),
+    ],
+) -> None:
+    """Build a rebuildable SQLite serving index from projected records."""
+    try:
+        index = SQLiteReleaseIndex.build(
+            path=db,
+            manifest=load_site_manifest(manifest),
+            records=load_projected_records(records),
+        )
+    except (ManifestError, IndexError, SQLiteIndexError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(json.dumps(index.summary(), indent=2, sort_keys=True))
+
+
+@app.command("sqlite-summary")
+def sqlite_summary(
+    db: Annotated[
+        Path,
+        typer.Option(
+            "--db",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="SQLite database file to inspect.",
+        ),
+    ],
+) -> None:
+    """Print release and table counts from a SQLite serving index."""
+    try:
+        summary = SQLiteReleaseIndex(db).summary()
+    except SQLiteIndexError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(json.dumps(summary, indent=2, sort_keys=True))
+
+
+@app.command("sqlite-query")
+def sqlite_query(
+    db: Annotated[
+        Path,
+        typer.Option(
+            "--db",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="SQLite database file to query.",
+        ),
+    ],
+    request: Annotated[
+        Path,
+        typer.Option(
+            "--request",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Query request YAML file.",
+        ),
+    ],
+) -> None:
+    """Run one query request against a SQLite serving index."""
+    try:
+        outcome = SQLiteReleaseIndex(db).query(load_query_request(request))
+    except (IndexError, SQLiteIndexError) as exc:
         raise typer.BadParameter(str(exc)) from exc
     typer.echo(json.dumps(outcome, indent=2, sort_keys=True))
 

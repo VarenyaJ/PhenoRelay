@@ -9,6 +9,7 @@ Initial model areas:
 - query request;
 - query outcome;
 - projected Phenopacket record;
+- SQLite serving index;
 - evidence snippet;
 - clinical impact annotation;
 - reference cache metadata;
@@ -20,4 +21,5 @@ The first schema lives at `src/phenorelay/schema/phenorelay.yaml`. The first
 examples live under `examples/` and cover a site manifest, a query request, and a
 query outcome with optional evidence. Clinical impact examples are synthetic and
 show how evidence-bearing annotations can be represented without restricted
-source data.
+source data. SQLite indexes are rebuildable serving artifacts derived from the
+manifest and projected records, not the source of truth.

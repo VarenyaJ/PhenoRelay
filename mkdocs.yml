@@ -43,6 +43,7 @@ nav:
       - Quality Control: quality-control.md
       - Agent Workflows: agent-workflows.md
       - Reference Caches: reference-caches.md
+      - SQLite Index: how-to-guides/sqlite-index.md
   - Explanation:
       - Design Decisions: design/decisions.md
       - Bycon and Beacon: design/bycon-and-beacon.md
