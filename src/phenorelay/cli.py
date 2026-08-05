@@ -9,6 +9,11 @@ import yaml
 
 from phenorelay import __version__
 from phenorelay.backends import BACKEND_CAPABILITIES, filter_backend_capabilities
+from phenorelay.clinical_impact import (
+    ClinicalImpactError,
+    load_clinical_impact_annotations,
+    summarize_clinical_impact,
+)
 from phenorelay.evidence import check_evidence_snippets
 from phenorelay.index import (
     IndexError,
@@ -235,6 +240,28 @@ def validate_evidence(
     typer.echo(json.dumps([check.to_dict() for check in checks], indent=2, sort_keys=True))
     if any(not check.ok for check in checks):
         raise typer.Exit(1)
+
+
+@app.command("impact-summary")
+def impact_summary(
+    annotations: Annotated[
+        Path,
+        typer.Option(
+            "--annotations",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Clinical impact annotation YAML file to summarize.",
+        ),
+    ],
+) -> None:
+    """Print a summary of clinical impact annotations."""
+    try:
+        loaded = load_clinical_impact_annotations(annotations)
+    except ClinicalImpactError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    typer.echo(json.dumps(summarize_clinical_impact(loaded), indent=2, sort_keys=True))
 
 
 def build_local_index(manifest: Path, records: Path) -> LocalReleaseIndex:

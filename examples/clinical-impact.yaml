@@ -1,0 +1,34 @@
+annotations:
+  - impact_id: synthetic-impact-1
+    subject: OMIM:154700
+    subject_kind: disease
+    axis: pregnancy_maternal_impact
+    derived_tier: pregnancy_critical
+    predicate: possible
+    confidence: 0.4
+    source_id: PMID:00000000
+    source_version: synthetic
+    snippet: Synthetic placeholder text for schema validation.
+    start_offset: 0
+    end_offset: 49
+    extraction_method: manual_curation
+    review_status: reviewed
+    created_by_tool: phenorelay-example
+    cache_release_id: synthetic-reference-cache
+    evidence:
+      - reference: PMID:00000000
+        snippet: Synthetic placeholder text for schema validation.
+        support: support
+        explanation: Demonstrates impact annotation evidence without restricted source data.
+  - impact_id: synthetic-impact-2
+    subject: MONDO:0000001
+    subject_kind: disease
+    axis: neurodevelopmental_impact
+    derived_tier: longitudinal_prognostic_complexity
+    predicate: present
+    confidence: 0.8
+    source_id: PMID:00000000
+    source_version: synthetic
+    snippet: Synthetic placeholder text for schema validation.
+    extraction_method: hpo_descendant_rule
+    review_status: unreviewed

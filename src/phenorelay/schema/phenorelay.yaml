@@ -15,6 +15,7 @@ prefixes:
   MONDO: http://purl.obolibrary.org/obo/MONDO_
   MAXO: http://purl.obolibrary.org/obo/MAXO_
   HGNC: https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/
+  OMIM: https://omim.org/entry/
   PMID: https://pubmed.ncbi.nlm.nih.gov/
   DOI: https://doi.org/
 
@@ -56,6 +57,49 @@ enums:
       partial:
       no_evidence:
       wrong_statement:
+  ClinicalImpactAxisEnum:
+    permissible_values:
+      pregnancy_maternal_impact:
+      fetal_neonatal_urgency:
+      major_health_management_risk:
+      neurodevelopmental_impact:
+      mortality_timing:
+      hospitalization_burden:
+      penetrance:
+      expressivity:
+      evidence_quality:
+  ClinicalImpactTierEnum:
+    permissible_values:
+      pregnancy_critical:
+      major_health_management:
+      longitudinal_prognostic_complexity:
+  EvidencePredicateEnum:
+    permissible_values:
+      present:
+      possible:
+      absent:
+      disputed:
+      insufficient_evidence:
+  ImpactSubjectKindEnum:
+    permissible_values:
+      disease:
+      gene:
+      variant:
+      phenopacket:
+      query_target:
+  ExtractionMethodEnum:
+    permissible_values:
+      hpo_descendant_rule:
+      mondo_crossref:
+      omim_synopsis_phrase:
+      pubmed_snippet:
+      manual_curation:
+      local_cache:
+  ReviewStatusEnum:
+    permissible_values:
+      unreviewed:
+      reviewed:
+      rejected:
   BackendKindEnum:
     permissible_values:
       memory:
@@ -217,6 +261,53 @@ slots:
     multivalued: true
     inlined_as_list: true
     range: EvidenceSnippet
+  impact_id:
+    identifier: true
+    range: string
+    required: true
+  subject:
+    range: Curie
+    required: true
+  subject_kind:
+    range: ImpactSubjectKindEnum
+    required: true
+  axis:
+    range: ClinicalImpactAxisEnum
+    required: true
+  derived_tier:
+    range: ClinicalImpactTierEnum
+  predicate:
+    range: EvidencePredicateEnum
+    required: true
+  confidence:
+    range: double
+    minimum_value: 0
+    maximum_value: 1
+  source_id:
+    range: ReferenceCurie
+    required: true
+  source_version:
+    range: string
+  start_offset:
+    range: integer
+    minimum_value: 0
+  end_offset:
+    range: integer
+    minimum_value: 0
+  extraction_method:
+    range: ExtractionMethodEnum
+    required: true
+  review_status:
+    range: ReviewStatusEnum
+    required: true
+  created_by_tool:
+    range: string
+  cache_release_id:
+    range: string
+  annotations:
+    multivalued: true
+    inlined_as_list: true
+    range: ClinicalImpactAnnotation
   backend_kind:
     range: BackendKindEnum
     required: true
@@ -313,6 +404,31 @@ classes:
       - snippet
       - support
       - explanation
+
+  ClinicalImpactAnnotation:
+    slots:
+      - impact_id
+      - subject
+      - subject_kind
+      - axis
+      - derived_tier
+      - predicate
+      - confidence
+      - source_id
+      - source_version
+      - snippet
+      - start_offset
+      - end_offset
+      - extraction_method
+      - review_status
+      - created_by_tool
+      - cache_release_id
+      - evidence
+
+  ClinicalImpactAnnotationCollection:
+    tree_root: true
+    slots:
+      - annotations
 
   StorageBackendCapabilities:
     slots:

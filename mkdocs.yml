@@ -38,6 +38,7 @@ nav:
       - Phenopacket-Native Discovery: primers/phenopacket-native-discovery.md
       - Capability-Aware Federation: primers/capability-aware-federation.md
       - Evidence Snippets: primers/evidence-snippets.md
+      - Clinical Impact Annotations: primers/clinical-impact.md
   - How-to Guides:
       - Quality Control: quality-control.md
       - Agent Workflows: agent-workflows.md
