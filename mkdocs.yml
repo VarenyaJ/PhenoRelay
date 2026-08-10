@@ -46,7 +46,8 @@ nav:
       - SQLite Index: how-to-guides/sqlite-index.md
   - Explanation:
       - Design Decisions: design/decisions.md
-      - Bycon and Beacon: design/bycon-and-beacon.md
+      - Beacon Compatibility: design/beacon-compatibility.md
+      - Beacon HTTP Adapter: design/beacon-http-adapter.md
       - Privacy Defaults: design/privacy-defaults.md
       - Storage Backends: design/storage-backends.md
   - Data Model: data-model.md

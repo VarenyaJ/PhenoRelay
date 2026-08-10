@@ -13,3 +13,6 @@ PhenoRelay responses should preserve these states:
 
 Future relay nodes must never increase the detail returned by a data-owning site.
 
+Beacon-facing adapters must preserve the same distinctions. A query feature that
+is not implemented should remain unsupported, even if the Beacon-facing response
+shape differs from the native PhenoRelay response.
