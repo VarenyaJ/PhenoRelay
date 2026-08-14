@@ -3,8 +3,10 @@ records:
     subject_id_redacted: true
     phenotypes:
       - term: HP:0001250
+        label: Seizure
         presence: present
       - term: HP:0011344
+        label: Severe global developmental delay
         presence: excluded
     diseases:
       - term: MONDO:0000001
@@ -16,6 +18,7 @@ records:
     subject_id_redacted: true
     phenotypes:
       - term: HP:0004322
+        label: Short stature
         presence: present
     diseases:
       - term: MONDO:0000002

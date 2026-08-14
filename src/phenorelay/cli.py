@@ -15,6 +15,11 @@ from phenorelay.clinical_impact import (
     summarize_clinical_impact,
 )
 from phenorelay.evidence import check_evidence_snippets
+from phenorelay.hpo_validation import (
+    HpoRelease,
+    HpoValidationError,
+    validate_projected_phenotypes,
+)
 from phenorelay.index import (
     IndexError,
     LocalReleaseIndex,
@@ -336,6 +341,43 @@ def validate_evidence(
     checks = check_evidence_snippets(data, cache)
     typer.echo(json.dumps([check.to_dict() for check in checks], indent=2, sort_keys=True))
     if any(not check.ok for check in checks):
+        raise typer.Exit(1)
+
+
+@app.command("validate-phenotypes")
+def validate_phenotypes(
+    records: Annotated[
+        Path,
+        typer.Option(
+            "--records",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Projected record YAML file to validate.",
+        ),
+    ],
+    hpo: Annotated[
+        Path,
+        typer.Option(
+            "--hpo",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="HPO OBOGraph JSON file. Defaults to ~/.hpo/hp.json.",
+        ),
+    ] = Path("~/.hpo/hp.json"),
+) -> None:
+    """Validate projected phenotype IDs and labels against a local HPO release."""
+    try:
+        report = validate_projected_phenotypes(
+            records=load_projected_records(records),
+            hpo=HpoRelease.from_json_path(hpo.expanduser()),
+        )
+    except (IndexError, HpoValidationError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    typer.echo(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+    if not report.ok:
         raise typer.Exit(1)
 
 

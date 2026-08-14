@@ -1,0 +1,41 @@
+{
+  "graphs": [
+    {
+      "id": "http://purl.obolibrary.org/obo/hp.json",
+      "meta": {
+        "version": "http://purl.obolibrary.org/obo/hp/releases/synthetic/hp.json",
+        "basicPropertyValues": [
+          {
+            "pred": "http://www.w3.org/2002/07/owl#versionInfo",
+            "val": "synthetic"
+          }
+        ]
+      },
+      "nodes": [
+        {
+          "id": "http://purl.obolibrary.org/obo/HP_0001250",
+          "lbl": "Seizure",
+          "type": "CLASS",
+          "meta": {
+            "synonyms": [
+              {
+                "pred": "hasExactSynonym",
+                "val": "Epileptic seizure"
+              }
+            ]
+          }
+        },
+        {
+          "id": "http://purl.obolibrary.org/obo/HP_0011344",
+          "lbl": "Severe global developmental delay",
+          "type": "CLASS"
+        },
+        {
+          "id": "http://purl.obolibrary.org/obo/HP_0004322",
+          "lbl": "Short stature",
+          "type": "CLASS"
+        }
+      ]
+    }
+  ]
+}

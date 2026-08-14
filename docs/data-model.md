@@ -9,6 +9,7 @@ Initial model areas:
 - query request;
 - query outcome;
 - projected Phenopacket record;
+- projected phenotype validation report;
 - SQLite serving index;
 - evidence snippet;
 - clinical impact annotation;
@@ -22,4 +23,6 @@ examples live under `examples/` and cover a site manifest, a query request, and 
 query outcome with optional evidence. Clinical impact examples are synthetic and
 show how evidence-bearing annotations can be represented without restricted
 source data. SQLite indexes are rebuildable serving artifacts derived from the
-manifest and projected records, not the source of truth.
+manifest and projected records, not the source of truth. HPO validation reports
+check projected phenotype IDs and labels against the configured ontology release
+before those records are activated for serving.

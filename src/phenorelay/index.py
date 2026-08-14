@@ -17,15 +17,19 @@ class IndexError(ValueError):
 @dataclass(frozen=True)
 class ProjectedTerm:
     term: str
+    label: str | None = None
     presence: str = "present"
 
     @classmethod
     def from_mapping(cls, data: dict[str, Any]) -> ProjectedTerm:
         term = data.get("term")
+        label = data.get("label")
         presence = data.get("presence", "present")
         if not isinstance(term, str) or not isinstance(presence, str):
             raise IndexError("projected terms require term and presence strings")
-        return cls(term=term, presence=presence)
+        if label is not None and not isinstance(label, str):
+            raise IndexError("projected term labels must be strings when present")
+        return cls(term=term, label=label, presence=presence)
 
 
 @dataclass(frozen=True)

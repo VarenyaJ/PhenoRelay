@@ -44,6 +44,7 @@ nav:
       - Agent Workflows: agent-workflows.md
       - Reference Caches: reference-caches.md
       - SQLite Index: how-to-guides/sqlite-index.md
+      - HPO Validation: how-to-guides/hpo-validation.md
   - Explanation:
       - Design Decisions: design/decisions.md
       - Beacon Compatibility: design/beacon-compatibility.md

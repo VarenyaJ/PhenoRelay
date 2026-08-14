@@ -199,6 +199,8 @@ slots:
     required: true
   term:
     range: Curie
+  label:
+    range: string
   match_mode:
     range: MatchModeEnum
   presence:
@@ -396,6 +398,7 @@ classes:
   ProjectedTerm:
     slots:
       - term
+      - label
       - presence
 
   EvidenceSnippet:
