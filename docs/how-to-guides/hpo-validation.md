@@ -21,3 +21,16 @@ The validator checks:
 Missing IDs and label mismatches produce structured findings and a non-zero exit.
 Storage adapters should consume validated projected records rather than performing
 hidden ontology validation during database writes.
+
+SQLite builds can run the same check as a release gate:
+
+```bash
+phenorelay sqlite-build \
+  --manifest examples/site-manifest.yaml \
+  --records examples/projected-records.yaml \
+  --db release.sqlite \
+  --validate-hpo ~/.hpo/hp.json
+```
+
+The gate runs before SQLite tables are created or replaced. A failed report leaves
+any existing database file unchanged.

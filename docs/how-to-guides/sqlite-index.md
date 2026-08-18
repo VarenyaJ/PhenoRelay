@@ -13,6 +13,20 @@ phenorelay sqlite-build \
   --db release.sqlite
 ```
 
+For release activation, validate projected phenotype IDs and labels against the
+local HPO release before writing the index:
+
+```bash
+phenorelay sqlite-build \
+  --manifest examples/site-manifest.yaml \
+  --records examples/projected-records.yaml \
+  --db release.sqlite \
+  --validate-hpo ~/.hpo/hp.json
+```
+
+If validation fails, the command prints a structured validation report, exits
+non-zero, and does not create or replace the SQLite database.
+
 Inspect the release:
 
 ```bash

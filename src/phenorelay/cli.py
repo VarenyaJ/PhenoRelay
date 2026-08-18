@@ -241,17 +241,49 @@ def sqlite_build(
             help="SQLite database file to create or replace.",
         ),
     ],
+    validate_hpo: Annotated[
+        Path | None,
+        typer.Option(
+            "--validate-hpo",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help=(
+                "Validate projected phenotype IDs and labels against this HPO OBOGraph "
+                "JSON before writing."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """Build a rebuildable SQLite serving index from projected records."""
     try:
+        projected_records = load_projected_records(records)
+        validation_report = None
+        if validate_hpo is not None:
+            hpo = HpoRelease.from_json_path(validate_hpo.expanduser())
+            validation_report = validate_projected_phenotypes(projected_records, hpo)
+            if not validation_report.ok:
+                typer.echo(
+                    json.dumps(
+                        {"validation": validation_report.to_dict()}, indent=2, sort_keys=True
+                    )
+                )
+                raise typer.Exit(1)
+
         index = SQLiteReleaseIndex.build(
             path=db,
             manifest=load_site_manifest(manifest),
-            records=load_projected_records(records),
+            records=projected_records,
         )
-    except (ManifestError, IndexError, SQLiteIndexError) as exc:
+    except (ManifestError, IndexError, SQLiteIndexError, HpoValidationError) as exc:
         raise typer.BadParameter(str(exc)) from exc
-    typer.echo(json.dumps(index.summary(), indent=2, sort_keys=True))
+    output = {"build": index.summary()}
+    if validation_report is not None:
+        output["validation"] = validation_report.to_dict()
+    if validation_report is None:
+        typer.echo(json.dumps(index.summary(), indent=2, sort_keys=True))
+    else:
+        typer.echo(json.dumps(output, indent=2, sort_keys=True))
 
 
 @app.command("sqlite-summary")
