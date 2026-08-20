@@ -15,9 +15,11 @@ The first scaffold defines:
   Hail, GenomicsDB, TileDB, TileDB-VCF, Spark, Sail, Velox, lakehouse-style
   deployments, Terra, AnVIL, gnomAD, HDF5, FHIR, OMOP, and Redis/Valkey.
 
-Only the in-memory adapter has behavior at this stage. The other adapters declare
-intended capabilities without adding database client dependencies. SQLite is a
-local/demo adapter, not a Beacon requirement.
+Only the in-memory adapter and SQLite adapter have behavior at this stage. The
+other adapters declare intended capabilities without adding database client
+dependencies. SQLite is a local/demo adapter, not a Beacon requirement.
+PostgreSQL is scaffolded as the multi-user relational serving-index path: it has
+a printable schema, but no live loader or query execution yet.
 
 Every backend must preserve these semantics:
 

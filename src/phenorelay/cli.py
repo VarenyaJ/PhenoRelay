@@ -27,6 +27,7 @@ from phenorelay.index import (
     load_query_request,
 )
 from phenorelay.manifest import ManifestError, load_site_manifest
+from phenorelay.postgres_index import PostgresIndexError, PostgresSchema
 from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
 from phenorelay.sqlite_index import SQLiteIndexError, SQLiteReleaseIndex
 
@@ -336,6 +337,30 @@ def sqlite_query(
     except (IndexError, SQLiteIndexError) as exc:
         raise typer.BadParameter(str(exc)) from exc
     typer.echo(json.dumps(outcome, indent=2, sort_keys=True))
+
+
+@app.command("postgres-schema")
+def postgres_schema(
+    schema: Annotated[
+        str,
+        typer.Option(
+            "--schema",
+            help="PostgreSQL schema namespace to use for PhenoRelay tables.",
+        ),
+    ] = "phenorelay",
+    include_drop: Annotated[
+        bool,
+        typer.Option(
+            "--include-drop",
+            help="Include DROP TABLE statements before CREATE statements.",
+        ),
+    ] = False,
+) -> None:
+    """Print the scaffolded PostgreSQL serving-index schema."""
+    try:
+        typer.echo(PostgresSchema(schema_name=schema, include_drop=include_drop).ddl())
+    except PostgresIndexError as exc:
+        raise typer.BadParameter(str(exc)) from exc
 
 
 @app.command("validate-evidence")
