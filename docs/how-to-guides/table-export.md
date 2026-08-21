@@ -38,12 +38,25 @@ Current format support is intentionally narrow:
 
 - `csv` is implemented with the Python standard library;
 - `parquet` is planned but not implemented yet;
-- DuckDB query smoke tests are planned after the Parquet dependency decision.
+- DuckDB can query the exported CSV tables directly.
+
+Example DuckDB query:
+
+```sql
+CREATE VIEW phenotypes AS
+SELECT *
+FROM read_csv_auto('release-tables/phenotypes.csv');
+
+SELECT COUNT(DISTINCT phenopacket_id)
+FROM phenotypes
+WHERE term = 'HP:0001250'
+  AND presence = 'present';
+```
 
 TODOs before analytical use:
 
 - add Parquet output after choosing the table writer dependency;
-- add DuckDB smoke tests for exact count and existence queries;
+- add DuckDB-backed CLI helpers if repeated ad hoc CSV queries become common;
 - add partitioned export layout for larger releases;
 - include ontology-release metadata in a machine-readable sidecar if table formats
   need more than the current release table;
