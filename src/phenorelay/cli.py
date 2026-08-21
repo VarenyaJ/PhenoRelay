@@ -30,6 +30,7 @@ from phenorelay.manifest import ManifestError, load_site_manifest
 from phenorelay.postgres_index import PostgresIndexError, PostgresSchema
 from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
 from phenorelay.sqlite_index import SQLiteIndexError, SQLiteReleaseIndex
+from phenorelay.table_export import TableExportError, export_release_tables
 
 app = typer.Typer(
     name="phenorelay",
@@ -361,6 +362,87 @@ def postgres_schema(
         typer.echo(PostgresSchema(schema_name=schema, include_drop=include_drop).ddl())
     except PostgresIndexError as exc:
         raise typer.BadParameter(str(exc)) from exc
+
+
+@app.command("export-tables")
+def export_tables(
+    manifest: Annotated[
+        Path,
+        typer.Option(
+            "--manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Site manifest YAML file for the local release.",
+        ),
+    ],
+    records: Annotated[
+        Path,
+        typer.Option(
+            "--records",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Projected record YAML file to export.",
+        ),
+    ],
+    out_dir: Annotated[
+        Path,
+        typer.Option(
+            "--out-dir",
+            file_okay=False,
+            help="Directory where table files will be written.",
+        ),
+    ],
+    export_format: Annotated[
+        str,
+        typer.Option(
+            "--format",
+            help="Table export format. Only csv is implemented.",
+        ),
+    ] = "csv",
+    validate_hpo: Annotated[
+        Path | None,
+        typer.Option(
+            "--validate-hpo",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help=(
+                "Validate projected phenotype IDs and labels against this HPO OBOGraph "
+                "JSON before exporting."
+            ),
+        ),
+    ] = None,
+) -> None:
+    """Export projected records as flat serving-index tables."""
+    try:
+        projected_records = load_projected_records(records)
+        validation_report = None
+        if validate_hpo is not None:
+            hpo = HpoRelease.from_json_path(validate_hpo.expanduser())
+            validation_report = validate_projected_phenotypes(projected_records, hpo)
+            if not validation_report.ok:
+                typer.echo(
+                    json.dumps(
+                        {"validation": validation_report.to_dict()}, indent=2, sort_keys=True
+                    )
+                )
+                raise typer.Exit(1)
+
+        summary = export_release_tables(
+            manifest=load_site_manifest(manifest),
+            records=projected_records,
+            out_dir=out_dir,
+            export_format=export_format,
+        )
+    except (ManifestError, IndexError, HpoValidationError, TableExportError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    output = {"export": summary.to_dict()}
+    if validation_report is not None:
+        output["validation"] = validation_report.to_dict()
+    typer.echo(json.dumps(output, indent=2, sort_keys=True))
 
 
 @app.command("validate-evidence")

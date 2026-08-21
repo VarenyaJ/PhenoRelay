@@ -45,6 +45,7 @@ nav:
       - Reference Caches: reference-caches.md
       - SQLite Index: how-to-guides/sqlite-index.md
       - PostgreSQL Index: how-to-guides/postgres-index.md
+      - Table Export: how-to-guides/table-export.md
       - HPO Validation: how-to-guides/hpo-validation.md
   - Explanation:
       - Design Decisions: design/decisions.md

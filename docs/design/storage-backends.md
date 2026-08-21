@@ -20,6 +20,10 @@ other adapters declare intended capabilities without adding database client
 dependencies. SQLite is a local/demo adapter, not a Beacon requirement.
 PostgreSQL is scaffolded as the multi-user relational serving-index path: it has
 a printable schema, but no live loader or query execution yet.
+Table export provides CSV files with the same projected table shape as the
+serving indexes. That export is the first step toward DuckDB, Parquet, and
+lakehouse-style analytical workflows without adding those dependencies to the
+core CLI yet.
 
 Every backend must preserve these semantics:
 
