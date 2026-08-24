@@ -53,9 +53,29 @@ WHERE term = 'HP:0001250'
   AND presence = 'present';
 ```
 
+DuckDB can also convert the CSV tables to Parquet for local analytics:
+
+```sql
+CREATE VIEW phenotypes AS
+SELECT *
+FROM read_csv_auto('release-tables/phenotypes.csv');
+
+COPY phenotypes
+TO 'release-parquet/phenotypes.parquet'
+(FORMAT parquet);
+
+SELECT COUNT(*)
+FROM read_parquet('release-parquet/phenotypes.parquet');
+```
+
+This is currently an analytics workflow, not `phenorelay export-tables --format
+parquet` behavior. Keeping Parquet outside the runtime CLI avoids making DuckDB,
+PyArrow, or Polars a required install dependency before the writer choice is
+settled.
+
 TODOs before analytical use:
 
-- add Parquet output after choosing the table writer dependency;
+- add CLI Parquet output after choosing the table writer dependency;
 - add DuckDB-backed CLI helpers if repeated ad hoc CSV queries become common;
 - add partitioned export layout for larger releases;
 - include ontology-release metadata in a machine-readable sidecar if table formats

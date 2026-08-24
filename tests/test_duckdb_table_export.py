@@ -74,6 +74,49 @@ def test_duckdb_can_join_feature_tables_back_to_records(tmp_path) -> None:
     assert rows == [("synthetic-packet-2", "Short stature")]
 
 
+def test_duckdb_can_convert_exported_csv_tables_to_parquet(tmp_path) -> None:
+    table_dir = tmp_path / "tables"
+    parquet_dir = tmp_path / "parquet"
+    export_example_tables(table_dir)
+    parquet_dir.mkdir()
+
+    with duckdb.connect(":memory:") as connection:
+        create_views(connection, table_dir)
+        for table_name in export_table_names():
+            parquet_path = sql_string_literal(parquet_dir / f"{table_name}.parquet")
+            connection.execute(
+                f"""
+                COPY {table_name}
+                TO {parquet_path}
+                (FORMAT parquet)
+                """
+            )
+
+        phenotype_count = connection.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM read_parquet({sql_string_literal(parquet_dir / "phenotypes.parquet")})
+            WHERE term = 'HP:0001250'
+              AND presence = 'present'
+            """
+        ).fetchone()
+        record_columns = {
+            row[0]
+            for row in connection.execute(
+                "DESCRIBE SELECT * "
+                f"FROM read_parquet({sql_string_literal(parquet_dir / 'records.parquet')})"
+            ).fetchall()
+        }
+
+    assert phenotype_count == (1,)
+    assert "subject_id" not in record_columns
+    assert record_columns == {
+        "phenopacket_id",
+        "subject_id_redacted",
+        "has_genomic_interpretations",
+    }
+
+
 def build_sqlite_index(tmp_path) -> SQLiteReleaseIndex:
     return SQLiteReleaseIndex.build(
         path=tmp_path / "release.sqlite",
@@ -91,13 +134,7 @@ def export_example_tables(table_dir: Path) -> None:
 
 
 def create_views(connection: duckdb.DuckDBPyConnection, table_dir: Path) -> None:
-    for table_name in (
-        "records",
-        "phenotypes",
-        "diseases",
-        "medical_actions",
-        "release_metadata",
-    ):
+    for table_name in export_table_names():
         table_path = sql_string_literal(table_dir / f"{table_name}.csv")
         connection.execute(
             f"""
@@ -106,6 +143,16 @@ def create_views(connection: duckdb.DuckDBPyConnection, table_dir: Path) -> None
             FROM read_csv_auto({table_path})
             """
         )
+
+
+def export_table_names() -> tuple[str, ...]:
+    return (
+        "records",
+        "phenotypes",
+        "diseases",
+        "medical_actions",
+        "release_metadata",
+    )
 
 
 def count_one(
