@@ -5,6 +5,7 @@
 /docs/inspirations/
 /docs/uv.lock
 /.claude/
+/.phenorelay-demo/
 .venv/
 __pycache__/
 *.py[cod]

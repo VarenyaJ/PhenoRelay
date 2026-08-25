@@ -48,6 +48,23 @@ uv run phenorelay --help
 uv run pytest
 ```
 
+### Build And Serve The Docs Locally
+
+Install the docs dependencies through `uv`, then build the MkDocs site:
+
+```bash
+uv sync --extra docs
+uv run --extra docs mkdocs build --strict
+```
+
+The generated HTML is written to `site/`. Serve it locally while editing:
+
+```bash
+uv run --extra docs mkdocs serve --dev-addr 127.0.0.1:8001
+```
+
+Open <http://127.0.0.1:8001/> in a browser.
+
 Keep each commit limited to one reviewable concern. Before committing, inspect the
 staged patch:
 

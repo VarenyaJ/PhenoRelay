@@ -14,6 +14,13 @@ from phenorelay.clinical_impact import (
     load_clinical_impact_annotations,
     summarize_clinical_impact,
 )
+from phenorelay.demo_data import (
+    DEFAULT_COHORTS,
+    DEFAULT_OUT_DIR,
+    DEFAULT_STORE,
+    DemoDataError,
+    fetch_demo_phenopackets,
+)
 from phenorelay.evidence import check_evidence_snippets
 from phenorelay.hpo_validation import (
     HpoRelease,
@@ -29,6 +36,7 @@ from phenorelay.index import (
 from phenorelay.manifest import ManifestError, load_site_manifest
 from phenorelay.postgres_index import PostgresIndexError, PostgresSchema
 from phenorelay.reference_cache import ReferenceCacheError, load_reference_cache
+from phenorelay.server import create_app
 from phenorelay.sqlite_index import SQLiteIndexError, SQLiteReleaseIndex
 from phenorelay.table_export import TableExportError, export_release_tables
 
@@ -140,6 +148,95 @@ def backends(
             sort_keys=True,
         )
     )
+
+
+@app.command()
+def serve(
+    manifest: Annotated[
+        Path,
+        typer.Option(
+            "--manifest",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Site manifest YAML file for the served release.",
+        ),
+    ] = Path("examples/site-manifest.yaml"),
+    records: Annotated[
+        Path,
+        typer.Option(
+            "--records",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+            help="Projected record YAML file for the served release.",
+        ),
+    ] = Path("examples/projected-records.yaml"),
+    host: Annotated[
+        str,
+        typer.Option("--host", help="Host interface for the HTTP server."),
+    ] = "127.0.0.1",
+    port: Annotated[
+        int,
+        typer.Option("--port", help="Port for the HTTP server."),
+    ] = 8000,
+    demo: Annotated[
+        bool,
+        typer.Option("--demo", help="Mark the served release as public demo data."),
+    ] = False,
+) -> None:
+    """Serve Beacon-compatible and PhenoRelay-native HTTP routes."""
+    try:
+        import uvicorn
+    except ImportError as exc:
+        raise typer.BadParameter(
+            "server dependencies are unavailable; reinstall PhenoRelay with server support"
+        ) from exc
+    uvicorn.run(
+        create_app(manifest_path=manifest, records_path=records, demo=demo),
+        host=host,
+        port=port,
+    )
+
+
+@app.command("fetch-demo-phenopackets")
+def fetch_demo_phenopackets_command(
+    source: Annotated[
+        Path,
+        typer.Option(
+            "--source",
+            exists=True,
+            file_okay=False,
+            readable=True,
+            help="Local Phenopacket Store clone.",
+        ),
+    ] = DEFAULT_STORE,
+    out_dir: Annotated[
+        Path,
+        typer.Option(
+            "--out-dir",
+            file_okay=False,
+            help="Gitignored demo cache directory to populate.",
+        ),
+    ] = DEFAULT_OUT_DIR,
+    cohort: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--cohort",
+            help="Cohort notebook name to copy. Defaults to PTPN11, KRAS, and ABCA4.",
+        ),
+    ] = None,
+) -> None:
+    """Copy public Phenopacket Store demo files into a gitignored cache."""
+    try:
+        summary = fetch_demo_phenopackets(
+            source=source,
+            out_dir=out_dir,
+            cohorts=tuple(cohort) if cohort else DEFAULT_COHORTS,
+        )
+    except DemoDataError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(json.dumps(summary.to_dict(), indent=2, sort_keys=True))
 
 
 @app.command("index-summary")

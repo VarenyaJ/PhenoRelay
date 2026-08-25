@@ -47,6 +47,7 @@ nav:
       - PostgreSQL Index: how-to-guides/postgres-index.md
       - Table Export: how-to-guides/table-export.md
       - HPO Validation: how-to-guides/hpo-validation.md
+      - Local Browser and API: how-to-guides/local-browser-api.md
   - Explanation:
       - Design Decisions: design/decisions.md
       - Beacon Compatibility: design/beacon-compatibility.md

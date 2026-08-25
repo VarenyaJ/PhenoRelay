@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PhenoRelay</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>PhenoRelay</h1>
+        <p id="release">Loading release</p>
+      </div>
+      <label class="file-loader">
+        Local Phenopackets
+        <input id="file-input" type="file" multiple accept="application/json,.json">
+      </label>
+    </header>
+    <main class="layout">
+      <aside class="filters">
+        <h2>Query</h2>
+        <label>
+          Feature
+          <select id="feature">
+            <option value="phenotype">Phenotype</option>
+            <option value="disease">Disease</option>
+            <option value="medical_action">Medical action</option>
+          </select>
+        </label>
+        <label>
+          Term
+          <input id="term" value="HP:0001250">
+        </label>
+        <label>
+          Granularity
+          <select id="granularity">
+            <option value="count">Count</option>
+            <option value="existence">Existence</option>
+          </select>
+        </label>
+        <button id="run-query">Run</button>
+      </aside>
+      <section class="panel">
+        <nav class="tabs">
+          <button data-tab="overview" class="active">Overview</button>
+          <button data-tab="terms">Terms</button>
+          <button data-tab="records">Individuals</button>
+          <button data-tab="local">Local files</button>
+        </nav>
+        <div id="content"></div>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
