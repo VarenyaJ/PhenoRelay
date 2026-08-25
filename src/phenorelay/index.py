@@ -40,6 +40,11 @@ class ProjectedRecord:
     diseases: tuple[ProjectedTerm, ...]
     medical_actions: tuple[str, ...]
     has_genomic_interpretations: bool = False
+    source_cohort: str | None = None
+    source_filename: str | None = None
+    source_pmids: tuple[str, ...] = ()
+    genes: tuple[str, ...] = ()
+    variant_descriptors: tuple[str, ...] = ()
 
     @classmethod
     def from_mapping(cls, data: dict[str, Any]) -> ProjectedRecord:
@@ -55,6 +60,13 @@ class ProjectedRecord:
             diseases=parse_projected_terms(data.get("diseases") or []),
             medical_actions=parse_string_list(data.get("medical_actions") or [], "medical_actions"),
             has_genomic_interpretations=bool(data.get("has_genomic_interpretations", False)),
+            source_cohort=parse_optional_string(data.get("source_cohort"), "source_cohort"),
+            source_filename=parse_optional_string(data.get("source_filename"), "source_filename"),
+            source_pmids=parse_string_list(data.get("source_pmids") or [], "source_pmids"),
+            genes=parse_string_list(data.get("genes") or [], "genes"),
+            variant_descriptors=parse_string_list(
+                data.get("variant_descriptors") or [], "variant_descriptors"
+            ),
         )
 
 
@@ -167,6 +179,14 @@ def parse_string_list(value: Any, field: str) -> tuple[str, ...]:
     if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
         raise IndexError(f"{field} must be a list of strings")
     return tuple(value)
+
+
+def parse_optional_string(value: Any, field: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise IndexError(f"{field} must be a string when present")
+    return value
 
 
 def matches_presence(candidate: str, requested: Any) -> bool:

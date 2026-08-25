@@ -55,10 +55,15 @@ class QueryService:
             {
                 "phenopacket_id": record.phenopacket_id,
                 "subject_id_redacted": record.subject_id_redacted,
+                "source_cohort": record.source_cohort,
+                "source_filename": record.source_filename,
+                "source_pmids": ", ".join(record.source_pmids),
                 "phenotype_count": len(record.phenotypes),
                 "disease_count": len(record.diseases),
                 "medical_action_count": len(record.medical_actions),
                 "has_genomic_interpretations": record.has_genomic_interpretations,
+                "gene_count": len(record.genes),
+                "variant_descriptor_count": len(record.variant_descriptors),
             }
             for record in self.index.records
         ]

@@ -36,6 +36,14 @@ def test_query_service_builds_filtering_terms() -> None:
     }
 
 
+def test_query_service_record_summaries_include_projection_metadata() -> None:
+    summaries = example_service().record_summaries()
+
+    assert summaries[0]["phenopacket_id"] == "synthetic-packet-1"
+    assert summaries[0]["source_cohort"] is None
+    assert summaries[0]["gene_count"] == 0
+
+
 def example_service() -> QueryService:
     return QueryService(
         LocalReleaseIndex.build(

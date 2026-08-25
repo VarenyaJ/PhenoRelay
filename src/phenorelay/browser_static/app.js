@@ -103,14 +103,27 @@ function renderRecords() {
     <section class="card">
       <h2>Individuals</h2>
       <table>
-        <thead><tr><th>Phenopacket</th><th>Phenotypes</th><th>Diseases</th><th>Genomic</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Phenopacket</th>
+            <th>Cohort</th>
+            <th>Source file</th>
+            <th>Phenotypes</th>
+            <th>Diseases</th>
+            <th>Genes</th>
+            <th>Genomic</th>
+          </tr>
+        </thead>
         <tbody>
           ${state.records.map((record) => `
             <tr>
               <td>${escapeHtml(record.phenopacket_id)}</td>
+              <td>${escapeHtml(record.source_cohort || "")}</td>
+              <td>${escapeHtml(record.source_filename || "")}</td>
               <td>${record.phenotype_count}</td>
               <td>${record.disease_count}</td>
-              <td>${record.has_genomic_interpretations}</td>
+              <td>${record.gene_count}</td>
+              <td>${record.has_genomic_interpretations ? "yes" : "no"}</td>
             </tr>
           `).join("")}
         </tbody>

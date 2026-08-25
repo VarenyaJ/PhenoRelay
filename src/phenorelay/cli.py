@@ -21,6 +21,12 @@ from phenorelay.demo_data import (
     DemoDataError,
     fetch_demo_phenopackets,
 )
+from phenorelay.demo_projection import (
+    DEFAULT_DEMO_MANIFEST,
+    DEFAULT_DEMO_RECORDS,
+    DemoProjectionError,
+    build_demo_release,
+)
 from phenorelay.evidence import check_evidence_snippets
 from phenorelay.hpo_validation import (
     HpoRelease,
@@ -193,7 +199,7 @@ def serve(
             "server dependencies are unavailable; reinstall PhenoRelay with server support"
         ) from exc
     uvicorn.run(
-        create_app(manifest_path=manifest, records_path=records, demo=demo),
+        create_app(manifest_path=manifest, records_path=records, demo=demo, autoload_demo=True),
         host=host,
         port=port,
     )
@@ -235,6 +241,45 @@ def fetch_demo_phenopackets_command(
             cohorts=tuple(cohort) if cohort else DEFAULT_COHORTS,
         )
     except DemoDataError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(json.dumps(summary.to_dict(), indent=2, sort_keys=True))
+
+
+@app.command("build-demo-release")
+def build_demo_release_command(
+    demo_dir: Annotated[
+        Path,
+        typer.Option(
+            "--demo-dir",
+            file_okay=False,
+            help="Gitignored demo cache directory populated by fetch-demo-phenopackets.",
+        ),
+    ] = DEFAULT_OUT_DIR,
+    records: Annotated[
+        Path,
+        typer.Option(
+            "--records",
+            dir_okay=False,
+            help="Projected records YAML file to write.",
+        ),
+    ] = DEFAULT_DEMO_RECORDS,
+    manifest: Annotated[
+        Path,
+        typer.Option(
+            "--manifest",
+            dir_okay=False,
+            help="Site manifest YAML file to write.",
+        ),
+    ] = DEFAULT_DEMO_MANIFEST,
+) -> None:
+    """Project fetched public demo phenopackets into a served release."""
+    try:
+        summary = build_demo_release(
+            demo_dir=demo_dir,
+            records_path=records,
+            manifest_path=manifest,
+        )
+    except DemoProjectionError as exc:
         raise typer.BadParameter(str(exc)) from exc
     typer.echo(json.dumps(summary.to_dict(), indent=2, sort_keys=True))
 

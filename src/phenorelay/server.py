@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from phenorelay.demo_projection import DEFAULT_DEMO_MANIFEST, DEFAULT_DEMO_RECORDS
 from phenorelay.index import LocalReleaseIndex, load_projected_records
 from phenorelay.manifest import load_site_manifest
 from phenorelay.query_service import QueryService
@@ -18,7 +19,18 @@ def create_app(
     manifest_path: Path = Path("examples/site-manifest.yaml"),
     records_path: Path = Path("examples/projected-records.yaml"),
     demo: bool = False,
+    autoload_demo: bool = False,
 ) -> FastAPI:
+    if (
+        autoload_demo
+        and demo
+        and manifest_path == Path("examples/site-manifest.yaml")
+        and records_path == Path("examples/projected-records.yaml")
+    ):
+        if DEFAULT_DEMO_MANIFEST.exists() and DEFAULT_DEMO_RECORDS.exists():
+            manifest_path = DEFAULT_DEMO_MANIFEST
+            records_path = DEFAULT_DEMO_RECORDS
+
     service = QueryService(
         LocalReleaseIndex.build(
             manifest=load_site_manifest(manifest_path),

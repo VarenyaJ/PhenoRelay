@@ -65,6 +65,16 @@ That directory is ignored by git. The generated `source-manifest.yaml` records:
 
 The first configured demo cohorts are `PTPN11`, `KRAS`, and `ABCA4`.
 
+Project the fetched JSON files into a local release:
+
+```bash
+phenorelay build-demo-release
+```
+
+This writes `site-manifest.yaml` and `projected-records.yaml` under the ignored
+demo cache. With those files present, `phenorelay serve --demo` serves the
+generated public demo release by default.
+
 Raw source examples are suitable for public demo mode because they are public
 example data and the manifest records their provenance. Private or institutional
 releases should continue to serve aggregate and projected views by default.
