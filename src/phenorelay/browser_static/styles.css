@@ -68,6 +68,13 @@ button {
   cursor: pointer;
 }
 
+button.secondary {
+  background: #ffffff;
+  border-color: #b8c2cc;
+  color: #17202a;
+  margin-top: 8px;
+}
+
 .file-loader {
   margin: 0;
 }

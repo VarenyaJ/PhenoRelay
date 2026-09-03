@@ -4,7 +4,7 @@ from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -135,8 +135,33 @@ def create_app(
         return service.query(request)
 
     @app.get("/api/pheno/records")
-    def pheno_records() -> dict[str, Any]:
-        return {"release": service.release_metadata(), "records": service.record_summaries()}
+    def pheno_records(
+        cohort: str | None = Query(default=None),
+        phenotype: str | None = Query(default=None),
+        phenotype_presence: str | None = Query(default=None),
+        disease: str | None = Query(default=None),
+        gene: str | None = Query(default=None),
+        source_pmid: str | None = Query(default=None),
+        has_genomic_interpretations: str | None = Query(default=None),
+        text: str | None = Query(default=None),
+    ) -> dict[str, Any]:
+        filters = {
+            "cohort": cohort,
+            "phenotype": phenotype,
+            "phenotype_presence": phenotype_presence,
+            "disease": disease,
+            "gene": gene,
+            "source_pmid": source_pmid,
+            "has_genomic_interpretations": has_genomic_interpretations,
+            "text": text,
+        }
+        records = service.record_summaries(filters)
+        return {
+            "release": service.release_metadata(),
+            "filters": {key: value for key, value in filters.items() if value},
+            "record_count": len(records),
+            "records": records,
+        }
 
     return app
 

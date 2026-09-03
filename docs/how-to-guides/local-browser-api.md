@@ -29,6 +29,22 @@ POST /api/pheno/query
 GET  /api/pheno/records
 ```
 
+`GET /api/pheno/records` accepts optional filters:
+
+```text
+cohort
+phenotype
+phenotype_presence
+disease
+gene
+source_pmid
+has_genomic_interpretations
+text
+```
+
+Filters are combined as an intersection. The browser uses the same API route for
+its cohort, phenotype, disease, gene, PMID, genomic status, and text filters.
+
 Initial Beacon-compatible routes:
 
 ```text

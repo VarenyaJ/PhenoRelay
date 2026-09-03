@@ -2,9 +2,11 @@ const state = {
   info: null,
   terms: [],
   records: [],
+  recordCount: 0,
   localFiles: [],
   activeTab: "overview",
   lastQuery: null,
+  filters: {},
 };
 
 const content = document.querySelector("#content");
@@ -12,11 +14,11 @@ const content = document.querySelector("#content");
 async function loadApi() {
   state.info = await fetchJson("/api/pheno/info");
   const terms = await fetchJson("/api/pheno/filtering_terms");
-  const records = await fetchJson("/api/pheno/records");
   state.terms = terms.filtering_terms;
-  state.records = records.records;
+  await loadRecords();
   document.querySelector("#release").textContent =
     `${state.info.release.site_id} / ${state.info.release.release_id}`;
+  renderDatalists();
   render();
 }
 
@@ -46,6 +48,54 @@ async function runQuery() {
   render();
 }
 
+async function loadRecords() {
+  const params = new URLSearchParams();
+  Object.entries(state.filters).forEach(([key, value]) => {
+    if (value) {
+      params.set(key, value);
+    }
+  });
+  const suffix = params.toString() ? `?${params.toString()}` : "";
+  const records = await fetchJson(`/api/pheno/records${suffix}`);
+  state.records = records.records;
+  state.recordCount = records.record_count ?? records.records.length;
+}
+
+async function applyFilters() {
+  state.filters = {
+    cohort: document.querySelector("#filter-cohort").value,
+    phenotype: document.querySelector("#filter-phenotype").value,
+    phenotype_presence: document.querySelector("#filter-phenotype-presence").value,
+    disease: document.querySelector("#filter-disease").value,
+    gene: document.querySelector("#filter-gene").value,
+    has_genomic_interpretations: document.querySelector("#filter-genomics").value,
+    source_pmid: document.querySelector("#filter-pmid").value,
+    text: document.querySelector("#filter-text").value,
+  };
+  await loadRecords();
+  state.activeTab = "records";
+  render();
+}
+
+async function clearFilters() {
+  [
+    "#filter-cohort",
+    "#filter-phenotype",
+    "#filter-phenotype-presence",
+    "#filter-disease",
+    "#filter-gene",
+    "#filter-genomics",
+    "#filter-pmid",
+    "#filter-text",
+  ].forEach((selector) => {
+    document.querySelector(selector).value = "";
+  });
+  state.filters = {};
+  await loadRecords();
+  state.activeTab = "records";
+  render();
+}
+
 function render() {
   document.querySelectorAll(".tabs button").forEach((button) => {
     button.classList.toggle("active", button.dataset.tab === state.activeTab);
@@ -68,6 +118,10 @@ function renderOverview() {
       <h2>Release</h2>
       <p>${release.site_id || ""} / ${release.release_id || ""}</p>
       <p>${release.record_count || 0} records</p>
+    </section>
+    <section class="card">
+      <h2>Filtered records</h2>
+      <p>${state.recordCount} records match the active filters.</p>
     </section>
     <section class="card">
       <h2>Last query</h2>
@@ -102,6 +156,7 @@ function renderRecords() {
   content.innerHTML = `
     <section class="card">
       <h2>Individuals</h2>
+      <p>${state.recordCount} records match the active filters.</p>
       <table>
         <thead>
           <tr>
@@ -142,6 +197,25 @@ function renderLocalFiles() {
   `;
 }
 
+function renderDatalists() {
+  renderDatalist("cohort-options", "cohort");
+  renderDatalist("phenotype-options", "phenotype");
+  renderDatalist("disease-options", "disease");
+  renderDatalist("gene-options", "gene");
+  renderDatalist("pmid-options", "source_pmid");
+}
+
+function renderDatalist(id, feature) {
+  const options = state.terms
+    .filter((term) => term.feature === feature)
+    .map((term) => {
+      const label = term.label ? ` - ${term.label}` : "";
+      return `<option value="${escapeHtml(term.term)}">${escapeHtml(term.term + label)}</option>`;
+    })
+    .join("");
+  document.querySelector(`#${id}`).innerHTML = options;
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -151,6 +225,8 @@ function escapeHtml(value) {
 }
 
 document.querySelector("#run-query").addEventListener("click", runQuery);
+document.querySelector("#apply-filters").addEventListener("click", applyFilters);
+document.querySelector("#clear-filters").addEventListener("click", clearFilters);
 document.querySelectorAll(".tabs button").forEach((button) => {
   button.addEventListener("click", () => {
     state.activeTab = button.dataset.tab;

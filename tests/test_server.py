@@ -33,6 +33,16 @@ def test_server_exposes_filtering_terms() -> None:
     assert any(term["term"] == "HP:0001250" for term in response["filtering_terms"])
 
 
+def test_server_filters_pheno_records_by_query_parameters() -> None:
+    client = TestClient(create_app())
+
+    response = client.get("/api/pheno/records", params={"phenotype": "HP:0001250"}).json()
+
+    assert response["record_count"] == 1
+    assert response["filters"] == {"phenotype": "HP:0001250"}
+    assert response["records"][0]["phenopacket_id"] == "synthetic-packet-1"
+
+
 def test_server_runs_pheno_query() -> None:
     client = TestClient(create_app())
 

@@ -40,6 +40,54 @@
           </select>
         </label>
         <button id="run-query">Run</button>
+        <h2>Filters</h2>
+        <label>
+          Cohort
+          <input id="filter-cohort" list="cohort-options">
+        </label>
+        <label>
+          Phenotype
+          <input id="filter-phenotype" list="phenotype-options" placeholder="HP:0001250">
+        </label>
+        <label>
+          Phenotype presence
+          <select id="filter-phenotype-presence">
+            <option value="">Any</option>
+            <option value="present">Present</option>
+            <option value="excluded">Excluded</option>
+          </select>
+        </label>
+        <label>
+          Disease
+          <input id="filter-disease" list="disease-options">
+        </label>
+        <label>
+          Gene
+          <input id="filter-gene" list="gene-options">
+        </label>
+        <label>
+          Genomics
+          <select id="filter-genomics">
+            <option value="">Any</option>
+            <option value="true">With interpretation</option>
+            <option value="false">Without interpretation</option>
+          </select>
+        </label>
+        <label>
+          PMID
+          <input id="filter-pmid" list="pmid-options">
+        </label>
+        <label>
+          Text
+          <input id="filter-text" placeholder="file, label, ID, variant">
+        </label>
+        <button id="apply-filters">Apply filters</button>
+        <button id="clear-filters" class="secondary" type="button">Clear</button>
+        <datalist id="cohort-options"></datalist>
+        <datalist id="phenotype-options"></datalist>
+        <datalist id="disease-options"></datalist>
+        <datalist id="gene-options"></datalist>
+        <datalist id="pmid-options"></datalist>
       </aside>
       <section class="panel">
         <nav class="tabs">
