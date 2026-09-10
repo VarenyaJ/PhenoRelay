@@ -75,6 +75,15 @@ button.secondary {
   margin-top: 8px;
 }
 
+button.link-button {
+  background: transparent;
+  border: 0;
+  color: #1f6feb;
+  min-height: 0;
+  padding: 0;
+  text-align: left;
+}
+
 .file-loader {
   margin: 0;
 }
@@ -133,6 +142,42 @@ pre {
   color: #edf2f7;
   overflow: auto;
   padding: 14px;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  margin: 0 0 16px;
+}
+
+.detail-list dt,
+.detail-list dd {
+  border-bottom: 1px solid #e3e8ef;
+  font-size: 13px;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.detail-list dt {
+  color: #52616f;
+  font-weight: 700;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 16px;
+}
+
+h3 {
+  font-size: 14px;
+  margin: 0 0 8px;
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
 }
 
 @media (max-width: 780px) {

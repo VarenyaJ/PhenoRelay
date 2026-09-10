@@ -27,6 +27,8 @@ GET  /api/pheno/releases/current
 GET  /api/pheno/filtering_terms
 POST /api/pheno/query
 GET  /api/pheno/records
+GET  /api/pheno/records/{phenopacket_id}
+GET  /api/pheno/records/{phenopacket_id}/source
 ```
 
 `GET /api/pheno/records` accepts optional filters:
@@ -44,6 +46,12 @@ text
 
 Filters are combined as an intersection. The browser uses the same API route for
 its cohort, phenotype, disease, gene, PMID, genomic status, and text filters.
+
+The record-detail route returns the projected PhenoRelay view by default:
+phenotypes, excluded phenotypes, diseases, medical actions, genes, variant
+descriptors, PMIDs, and source filename when available. The raw source route is
+disabled for ordinary releases. Public demo serving can enable it explicitly so
+the browser can inspect the exact public example JSON behind a projected record.
 
 Initial Beacon-compatible routes:
 

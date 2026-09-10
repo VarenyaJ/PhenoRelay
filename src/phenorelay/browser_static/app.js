@@ -7,6 +7,8 @@ const state = {
   activeTab: "overview",
   lastQuery: null,
   filters: {},
+  selectedRecord: null,
+  rawSource: null,
 };
 
 const content = document.querySelector("#content");
@@ -96,6 +98,26 @@ async function clearFilters() {
   render();
 }
 
+async function showRecordDetail(phenopacketId) {
+  const detail = await fetchJson(`/api/pheno/records/${encodeURIComponent(phenopacketId)}`);
+  state.selectedRecord = detail.record;
+  state.rawSource = null;
+  state.activeTab = "records";
+  render();
+}
+
+async function loadRawSource(phenopacketId) {
+  try {
+    const source = await fetchJson(
+      `/api/pheno/records/${encodeURIComponent(phenopacketId)}/source`
+    );
+    state.rawSource = source;
+  } catch (error) {
+    state.rawSource = {error: error.message};
+  }
+  render();
+}
+
 function render() {
   document.querySelectorAll(".tabs button").forEach((button) => {
     button.classList.toggle("active", button.dataset.tab === state.activeTab);
@@ -172,7 +194,11 @@ function renderRecords() {
         <tbody>
           ${state.records.map((record) => `
             <tr>
-              <td>${escapeHtml(record.phenopacket_id)}</td>
+              <td>
+                <button class="link-button" data-record-id="${escapeHtml(record.phenopacket_id)}">
+                  ${escapeHtml(record.phenopacket_id)}
+                </button>
+              </td>
               <td>${escapeHtml(record.source_cohort || "")}</td>
               <td>${escapeHtml(record.source_filename || "")}</td>
               <td>${record.phenotype_count}</td>
@@ -184,7 +210,14 @@ function renderRecords() {
         </tbody>
       </table>
     </section>
+    ${renderSelectedRecord()}
   `;
+  document.querySelectorAll("[data-record-id]").forEach((button) => {
+    button.addEventListener("click", () => showRecordDetail(button.dataset.recordId));
+  });
+  document.querySelectorAll("[data-raw-source-id]").forEach((button) => {
+    button.addEventListener("click", () => loadRawSource(button.dataset.rawSourceId));
+  });
 }
 
 function renderLocalFiles() {
@@ -203,6 +236,54 @@ function renderDatalists() {
   renderDatalist("disease-options", "disease");
   renderDatalist("gene-options", "gene");
   renderDatalist("pmid-options", "source_pmid");
+}
+
+function renderSelectedRecord() {
+  const record = state.selectedRecord;
+  if (!record) {
+    return "";
+  }
+  return `
+    <section class="card">
+      <h2>Record detail</h2>
+      <dl class="detail-list">
+        <dt>Phenopacket</dt><dd>${escapeHtml(record.phenopacket_id)}</dd>
+        <dt>Cohort</dt><dd>${escapeHtml(record.source_cohort || "")}</dd>
+        <dt>Source file</dt><dd>${escapeHtml(record.source_filename || "")}</dd>
+        <dt>PMIDs</dt><dd>${escapeHtml((record.source_pmids || []).join(", "))}</dd>
+        <dt>Genes</dt><dd>${escapeHtml((record.genes || []).join(", "))}</dd>
+        <dt>Variants</dt><dd>${escapeHtml((record.variant_descriptors || []).join(", "))}</dd>
+      </dl>
+      <div class="detail-grid">
+        ${renderTermList("Present phenotypes", record.phenotypes, "present")}
+        ${renderTermList("Excluded phenotypes", record.phenotypes, "excluded")}
+        ${renderTermList("Diseases", record.diseases)}
+      </div>
+      <button data-raw-source-id="${escapeHtml(record.phenopacket_id)}">Load raw public source</button>
+      ${renderRawSource()}
+    </section>
+  `;
+}
+
+function renderTermList(title, terms, presence) {
+  const filtered = presence ? terms.filter((term) => term.presence === presence) : terms;
+  return `
+    <section class="detail-section">
+      <h3>${escapeHtml(title)}</h3>
+      <ul>
+        ${filtered.map((term) => `
+          <li><code>${escapeHtml(term.term)}</code> ${escapeHtml(term.label || "")}</li>
+        `).join("")}
+      </ul>
+    </section>
+  `;
+}
+
+function renderRawSource() {
+  if (!state.rawSource) {
+    return "";
+  }
+  return `<pre>${escapeHtml(JSON.stringify(state.rawSource, null, 2))}</pre>`;
 }
 
 function renderDatalist(id, feature) {

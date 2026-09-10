@@ -199,7 +199,13 @@ def serve(
             "server dependencies are unavailable; reinstall PhenoRelay with server support"
         ) from exc
     uvicorn.run(
-        create_app(manifest_path=manifest, records_path=records, demo=demo, autoload_demo=True),
+        create_app(
+            manifest_path=manifest,
+            records_path=records,
+            demo=demo,
+            autoload_demo=True,
+            allow_demo_raw_source=demo,
+        ),
         host=host,
         port=port,
     )

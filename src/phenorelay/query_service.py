@@ -77,6 +77,30 @@ class QueryService:
             for record in records
         ]
 
+    def record_detail(self, phenopacket_id: str) -> dict[str, Any] | None:
+        record = self.find_record(phenopacket_id)
+        if record is None:
+            return None
+        return {
+            "phenopacket_id": record.phenopacket_id,
+            "subject_id_redacted": record.subject_id_redacted,
+            "source_cohort": record.source_cohort,
+            "source_filename": record.source_filename,
+            "source_pmids": list(record.source_pmids),
+            "phenotypes": [term_to_dict(term) for term in record.phenotypes],
+            "diseases": [term_to_dict(term) for term in record.diseases],
+            "medical_actions": list(record.medical_actions),
+            "has_genomic_interpretations": record.has_genomic_interpretations,
+            "genes": list(record.genes),
+            "variant_descriptors": list(record.variant_descriptors),
+        }
+
+    def find_record(self, phenopacket_id: str) -> ProjectedRecord | None:
+        for record in self.index.records:
+            if record.phenopacket_id == phenopacket_id:
+                return record
+        return None
+
 
 def build_filtering_terms(records: tuple[ProjectedRecord, ...]) -> list[FilteringTerm]:
     cohort_counts: dict[str, int] = {}
@@ -198,6 +222,14 @@ def searchable_record_text(record: ProjectedRecord) -> str:
     values.extend(term.term for term in record.diseases)
     values.extend(term.label or "" for term in record.diseases)
     return " ".join(values)
+
+
+def term_to_dict(term: ProjectedTerm) -> dict[str, str | None]:
+    return {
+        "term": term.term,
+        "label": term.label,
+        "presence": term.presence,
+    }
 
 
 def add_projected_terms(

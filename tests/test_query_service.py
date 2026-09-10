@@ -49,6 +49,18 @@ def test_query_service_record_summaries_include_projection_metadata() -> None:
     assert summaries[0]["gene_count"] == 0
 
 
+def test_query_service_exposes_projected_record_detail() -> None:
+    detail = demo_service().record_detail("packet-1")
+
+    assert detail is not None
+    assert detail["phenopacket_id"] == "packet-1"
+    assert detail["source_pmids"] == ["PMID:12345678"]
+    assert detail["genes"] == ["PTPN11"]
+    assert detail["variant_descriptors"] == ["variant-1"]
+    assert detail["phenotypes"][0]["term"] == "HP:0004322"
+    assert detail["diseases"][0]["term"] == "OMIM:151100"
+
+
 def test_query_service_filters_records_by_demo_metadata() -> None:
     service = demo_service()
 

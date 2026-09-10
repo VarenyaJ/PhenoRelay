@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import json
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -20,6 +21,8 @@ def create_app(
     records_path: Path = Path("examples/projected-records.yaml"),
     demo: bool = False,
     autoload_demo: bool = False,
+    allow_demo_raw_source: bool = False,
+    demo_source_dir: Path | None = None,
 ) -> FastAPI:
     if (
         autoload_demo
@@ -40,6 +43,8 @@ def create_app(
     app = FastAPI(title="PhenoRelay", version="0.1.0")
     app.state.query_service = service
     app.state.demo = demo
+    app.state.demo_source_dir = demo_source_dir or DEFAULT_DEMO_RECORDS.parent / "source"
+    app.state.allow_demo_raw_source = allow_demo_raw_source
 
     static_dir = browser_static_path()
     if static_dir.exists():
@@ -161,6 +166,39 @@ def create_app(
             "filters": {key: value for key, value in filters.items() if value},
             "record_count": len(records),
             "records": records,
+        }
+
+    @app.get("/api/pheno/records/{phenopacket_id}")
+    def pheno_record_detail(phenopacket_id: str) -> dict[str, Any]:
+        detail = service.record_detail(phenopacket_id)
+        if detail is None:
+            raise HTTPException(status_code=404, detail="record not found")
+        return {"release": service.release_metadata(), "record": detail}
+
+    @app.get("/api/pheno/records/{phenopacket_id}/source")
+    def pheno_record_source(phenopacket_id: str) -> dict[str, Any]:
+        if not (demo and allow_demo_raw_source):
+            raise HTTPException(status_code=403, detail="raw source access is disabled")
+        record = service.find_record(phenopacket_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="record not found")
+        if record.source_cohort is None or record.source_filename is None:
+            raise HTTPException(status_code=404, detail="raw source file is unavailable")
+
+        source_path = (
+            app.state.demo_source_dir / record.source_cohort / record.source_filename
+        ).resolve()
+        source_root = app.state.demo_source_dir.resolve()
+        if source_root not in source_path.parents:
+            raise HTTPException(status_code=403, detail="raw source path is outside the demo cache")
+        if not source_path.exists():
+            raise HTTPException(status_code=404, detail="raw source file is unavailable")
+        return {
+            "release": service.release_metadata(),
+            "phenopacket_id": record.phenopacket_id,
+            "source_cohort": record.source_cohort,
+            "source_filename": record.source_filename,
+            "source": json.loads(source_path.read_text(encoding="utf-8")),
         }
 
     return app
