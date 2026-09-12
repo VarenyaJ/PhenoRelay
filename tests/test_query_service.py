@@ -97,6 +97,135 @@ def test_query_service_filters_records_by_terms_and_text() -> None:
     assert [record["phenopacket_id"] for record in text_matches] == ["packet-1"]
 
 
+def test_query_service_queries_first_class_record_filters() -> None:
+    service = demo_service()
+
+    gene = service.query(
+        {
+            "query_id": "gene-query",
+            "feature": "gene",
+            "term": "PTPN11",
+            "match_mode": "exact",
+            "requested_granularity": "count",
+        }
+    )
+    variant = service.query(
+        {
+            "query_id": "variant-query",
+            "feature": "variant_descriptor",
+            "term": "variant-1",
+            "match_mode": "exact",
+            "requested_granularity": "count",
+        }
+    )
+    cohort = service.query(
+        {
+            "query_id": "cohort-query",
+            "feature": "cohort",
+            "term": "PTPN11",
+            "match_mode": "exact",
+            "requested_granularity": "count",
+        }
+    )
+    pmid = service.query(
+        {
+            "query_id": "pmid-query",
+            "feature": "source_pmid",
+            "term": "PMID:12345678",
+            "match_mode": "exact",
+            "requested_granularity": "count",
+        }
+    )
+    genomics = service.query(
+        {
+            "query_id": "genomics-query",
+            "feature": "genomic_interpretation",
+            "term": "true",
+            "match_mode": "exact",
+            "requested_granularity": "count",
+        }
+    )
+
+    assert gene["outcome"]["count"] == 1
+    assert variant["outcome"]["count"] == 1
+    assert cohort["outcome"]["count"] == 1
+    assert pmid["outcome"]["count"] == 1
+    assert genomics["outcome"]["count"] == 1
+
+
+def test_query_service_queries_excluded_phenotypes_and_combined_filters() -> None:
+    service = demo_service()
+
+    excluded = service.query(
+        {
+            "query_id": "excluded-query",
+            "feature": "phenotype",
+            "term": "HP:0001250",
+            "match_mode": "exact",
+            "presence": "excluded",
+            "requested_granularity": "record",
+        }
+    )
+    combined = service.query(
+        {
+            "query_id": "combined-query",
+            "feature": "phenotype",
+            "term": "HP:0004322",
+            "match_mode": "exact",
+            "gene": "PTPN11",
+            "cohort": "PTPN11",
+            "requested_granularity": "record",
+        }
+    )
+    zero = service.query(
+        {
+            "query_id": "zero-query",
+            "feature": "phenotype",
+            "term": "HP:0004322",
+            "match_mode": "exact",
+            "gene": "ABCA4",
+            "requested_granularity": "count",
+        }
+    )
+    boolean_filter = service.query(
+        {
+            "query_id": "boolean-filter-query",
+            "feature": "phenotype",
+            "term": "HP:0004322",
+            "match_mode": "exact",
+            "has_genomic_interpretations": True,
+            "requested_granularity": "count",
+        }
+    )
+
+    assert excluded["outcome"]["count"] == 1
+    assert excluded["outcome"]["records"][0]["phenopacket_id"] == "packet-2"
+    assert combined["outcome"]["count"] == 1
+    assert combined["outcome"]["records"][0]["phenopacket_id"] == "packet-1"
+    assert zero["outcome"]["status"] == "match"
+    assert zero["outcome"]["exists"] is False
+    assert zero["outcome"]["count"] == 0
+    assert boolean_filter["outcome"]["count"] == 1
+
+
+def test_query_service_keeps_unsupported_match_modes_distinct() -> None:
+    response = demo_service().query(
+        {
+            "query_id": "descendant-query",
+            "feature": "phenotype",
+            "term": "HP:0004322",
+            "match_mode": "descendants",
+            "requested_granularity": "count",
+        }
+    )
+
+    assert response["outcome"] == {
+        "query_id": "descendant-query",
+        "status": "unsupported",
+        "feature": "phenotype",
+    }
+
+
 def example_service() -> QueryService:
     return QueryService(
         LocalReleaseIndex.build(

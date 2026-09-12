@@ -47,6 +47,25 @@ text
 Filters are combined as an intersection. The browser uses the same API route for
 its cohort, phenotype, disease, gene, PMID, genomic status, and text filters.
 
+`POST /api/pheno/query` accepts the same release-scoped discovery contract as the
+Beacon-facing adapter. The primary query is still `feature` + `term`, with
+`match_mode: exact` and `requested_granularity` set to `existence`, `count`, or
+`record`. Optional fields narrow the matched records before the response is
+counted:
+
+```text
+cohort
+gene
+source_pmid
+has_genomic_interpretations
+variant_descriptor
+text
+```
+
+Those filters are combined with the primary query as an intersection. Descendant
+expansion and nested boolean query logic are reported as unsupported until they
+are implemented explicitly.
+
 The record-detail route returns the projected PhenoRelay view by default:
 phenotypes, excluded phenotypes, diseases, medical actions, genes, variant
 descriptors, PMIDs, and source filename when available. The raw source route is

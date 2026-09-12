@@ -1,0 +1,11 @@
+{
+  "apiVersion": "v2.0",
+  "description": "Beacon-compatible adapter over a PhenoRelay release index.",
+  "environment": "demo",
+  "id": "synthetic-site",
+  "name": "PhenoRelay Beacon adapter",
+  "organization": {
+    "name": "PhenoRelay"
+  },
+  "version": "synthetic-release-1"
+}

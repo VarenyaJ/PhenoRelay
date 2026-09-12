@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "receivedRequestSummary": {
+      "feature": "phenotype",
+      "match_mode": "exact",
+      "presence": "present",
+      "query_id": "q1",
+      "requested_granularity": "count",
+      "term": "HP:0001250"
+    },
+    "requestedGranularity": "count"
+  },
+  "phenoRelay": {
+    "count": 1,
+    "exists": true,
+    "feature": "phenotype",
+    "query_id": "q1",
+    "status": "match"
+  },
+  "response": {
+    "resultSets": []
+  },
+  "responseSummary": {
+    "exists": true,
+    "numTotalResults": 1
+  }
+}

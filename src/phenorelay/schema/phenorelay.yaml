@@ -29,6 +29,10 @@ enums:
       disease:
       medical_action:
       gene:
+      cohort:
+      source_pmid:
+      genomic_interpretation:
+      variant_descriptor:
       cohort_statistics:
   MatchModeEnum:
     permissible_values:
@@ -227,6 +231,29 @@ slots:
     multivalued: true
     inlined_as_list: true
     range: ProjectedRecord
+  cohort:
+    range: string
+  source_cohort:
+    range: string
+  source_filename:
+    range: string
+  source_pmid:
+    range: ReferenceCurie
+  source_pmids:
+    multivalued: true
+    range: ReferenceCurie
+  gene:
+    range: string
+  genes:
+    multivalued: true
+    range: string
+  variant_descriptor:
+    range: string
+  variant_descriptors:
+    multivalued: true
+    range: string
+  text:
+    range: string
   phenopacket_id:
     range: string
     required: true
@@ -372,6 +399,12 @@ classes:
       - match_mode
       - presence
       - requested_granularity
+      - cohort
+      - gene
+      - source_pmid
+      - has_genomic_interpretations
+      - variant_descriptor
+      - text
 
   QueryOutcome:
     tree_root: true
@@ -394,6 +427,11 @@ classes:
       - diseases
       - medical_actions
       - has_genomic_interpretations
+      - source_cohort
+      - source_filename
+      - source_pmids
+      - genes
+      - variant_descriptors
 
   ProjectedTerm:
     slots:

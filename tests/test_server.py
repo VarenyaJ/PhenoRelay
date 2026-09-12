@@ -112,6 +112,25 @@ def test_server_runs_pheno_query() -> None:
     assert response["outcome"]["count"] == 1
 
 
+def test_server_runs_pheno_query_with_first_class_filters() -> None:
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/api/pheno/query",
+        json={
+            "query_id": "q1",
+            "feature": "genomic_interpretation",
+            "term": "true",
+            "match_mode": "exact",
+            "requested_granularity": "record",
+        },
+    ).json()
+
+    assert response["outcome"]["status"] == "match"
+    assert response["outcome"]["count"] == 1
+    assert response["outcome"]["records"][0]["phenopacket_id"] == "synthetic-packet-2"
+
+
 def test_server_exposes_beacon_info_shape() -> None:
     client = TestClient(create_app(demo=True))
 
@@ -128,6 +147,25 @@ def test_server_returns_unsupported_for_genomic_variants() -> None:
 
     assert response["phenoRelay"]["status"] == "unsupported"
     assert response["phenoRelay"]["feature"] == "variant"
+
+
+def test_server_beacon_individuals_uses_filtered_query_path() -> None:
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/api/individuals",
+        json={
+            "query_id": "q1",
+            "feature": "phenotype",
+            "term": "HP:0001250",
+            "match_mode": "exact",
+            "presence": "present",
+            "requested_granularity": "count",
+        },
+    ).json()
+
+    assert response["responseSummary"] == {"exists": True, "numTotalResults": 1}
+    assert response["phenoRelay"]["status"] == "match"
 
 
 def demo_raw_source_app(tmp_path, *, allow_raw: bool, source_filename: str = "public-packet.json"):

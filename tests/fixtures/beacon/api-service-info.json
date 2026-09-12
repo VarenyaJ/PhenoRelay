@@ -1,0 +1,14 @@
+{
+  "description": "Phenopacket-native discovery service with Beacon-compatible routes.",
+  "id": "synthetic-site",
+  "name": "PhenoRelay",
+  "organization": {
+    "name": "PhenoRelay"
+  },
+  "type": {
+    "artifact": "beacon",
+    "group": "org.ga4gh",
+    "version": "v2.0"
+  },
+  "version": "synthetic-release-1"
+}
